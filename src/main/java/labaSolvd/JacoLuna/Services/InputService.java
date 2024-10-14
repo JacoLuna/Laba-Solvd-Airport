@@ -17,44 +17,13 @@ public class InputService {
     private static final Logger CONSOLE = LogManager.getLogger("ConsoleLogger");
     public static  Scanner keyboard = new Scanner(System.in);
 
-    public static <T extends Number> T setInput(List<T> ansArray, Class<T> type){
-        T answer = null;
-        boolean isValid = false;
-        do {
-            try {
-                if (type == Integer.class) {
-                    answer = type.cast(keyboard.nextInt());
-                } else if (type == Float.class) {
-                    answer = type.cast(keyboard.nextFloat());
-                } else if (type == Long.class) {
-                    answer = type.cast(keyboard.nextLong());
-                }
-                if (!ansArray.contains(answer)){
-                    throw new MenuException("ERROR Option not available");
-                }
-                isValid = true;
-            }catch (InputMismatchException | MenuException e){
-                CONSOLE_ERROR.error(e);
-                keyboard.nextLine();
-            }catch (Exception e){
-                LOGGER.error(e);
-            }
-        } while (!isValid);
-        return answer;
-    }
     public static  <T extends Number> T setInput(String prompt, List<T> ansArray, Class<T> type){
         T answer = null;
         boolean isValid = false;
         do {
             System.out.print(prompt);
             try {
-                if (type == Integer.class) {
-                    answer = type.cast(keyboard.nextInt());
-                } else if (type == Float.class) {
-                    answer = type.cast(keyboard.nextFloat());
-                } else if (type == Long.class) {
-                    answer = type.cast(keyboard.nextLong());
-                }
+                answer = readAnswer(type);
                 if (!ansArray.contains(answer)){
                     throw new MenuException("ERROR Option not available");
                 }
@@ -75,15 +44,7 @@ public class InputService {
         do {
             CONSOLE.info(prompt);
             try {
-                if (type == Integer.class) {
-                    answer = type.cast(keyboard.nextInt());
-                } else if (type == Float.class) {
-                    answer = type.cast(keyboard.nextFloat());
-                } else if (type == Long.class) {
-                    answer = type.cast(keyboard.nextLong());
-                } else if (type == Double.class) {
-                    answer = type.cast(keyboard.nextDouble());
-                }
+                answer = readAnswer(type);
                 if (answer.doubleValue() < minValue.doubleValue() || answer.doubleValue() > maxValue.doubleValue()) {
                     throw new MenuException("ERROR Option not available");
                 }
@@ -98,6 +59,36 @@ public class InputService {
         return answer;
     }
 
+    public static <T extends Number> T setInput(String prompt, T maxValue, Class<T> type){
+        T answer = null;
+        boolean isValid = false;
+        do {
+            CONSOLE.info(prompt);
+            try {
+                answer = readAnswer(type);
+                if (answer.doubleValue() < 0 || answer.doubleValue() > maxValue.doubleValue()) {
+                    throw new MenuException("ERROR Option not available");
+                }
+                isValid = true;
+            }catch (InputMismatchException | MenuException e){
+                CONSOLE_ERROR.error(e);
+                keyboard.nextLine();
+            }catch (Exception e){
+                LOGGER.error(e);
+            }
+        } while (!isValid);
+        return answer;
+    }
+    public static <T extends Number> T readAnswer(Class<T> type){
+        T answer = null;
+        return switch (type.getSimpleName()) {
+            case "Integer" -> type.cast(keyboard.nextInt());
+            case "Float" -> type.cast(keyboard.nextFloat());
+            case "Long" -> type.cast(keyboard.nextLong());
+            case "Double" -> type.cast(keyboard.nextDouble());
+            default -> throw new IllegalArgumentException("Unsupported type: " + type);
+        };
+    }
     public static String stringAns(String prompt){
         System.out.println(prompt);
         return keyboard.next();

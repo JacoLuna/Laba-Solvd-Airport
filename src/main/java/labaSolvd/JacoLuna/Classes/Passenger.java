@@ -13,16 +13,15 @@ public class Passenger extends People{
         this.flightPoints = flightPoints;
         this.hasSpecialNeeds = hasSpecialNeeds;
     }
-    public Passenger(People people, Boolean VIP, int flightPoints, Boolean hasSpecialNeeds){
-        super(people.getName(), people.getSurname(), people.getEmail(), people.getAge());
-        initialize(VIP, flightPoints, hasSpecialNeeds);
+    public Passenger() {
+        super();
     }
     public Passenger(String name, String surname, String email, int age, Boolean VIP, int flightPoints, Boolean hasSpecialNeeds) {
         super(name, surname, email, age);
         initialize(VIP, flightPoints, hasSpecialNeeds);
     }
     public Passenger(long idPeople, String name, String surname, String email, int age, Boolean VIP, int flightPoints, Boolean hasSpecialNeeds) {
-        super(name, surname, email, age);
+        super(idPeople, name, surname, email, age);
         initialize(VIP, flightPoints, hasSpecialNeeds);
     }
     public Passenger(long idPeople, String name, String surname, String email, int age, long idPassenger, Boolean VIP, int flightPoints, Boolean hasSpecialNeeds) {
@@ -47,6 +46,18 @@ public class Passenger extends People{
         return hasSpecialNeeds;
     }
 
+    public void setVIP(Boolean VIP) {
+        this.VIP = VIP;
+    }
+
+    public void setFlightPoints(int flightPoints) {
+        this.flightPoints = flightPoints;
+    }
+
+    public void setHasSpecialNeeds(Boolean hasSpecialNeeds) {
+        this.hasSpecialNeeds = hasSpecialNeeds;
+    }
+
     public void setIdPassenger(long idPassenger) {
         this.idPassenger = idPassenger;
     }
@@ -63,5 +74,18 @@ public class Passenger extends People{
     @Override
     public int hashCode() {
         return super.hashCode() + (int)idPassenger + VIP.toString().length() + hasSpecialNeeds.toString().length();
+    }
+
+    @Override
+    public String toString() {
+        return  "'id Passenger=" + idPassenger +
+                ", VIP=" + VIP +
+                ", flightPoints=" + flightPoints +
+                ", hasSpecialNeeds=" + hasSpecialNeeds +
+                ", id People =" + getIdPeople() +
+                ", name =" + getName() +
+                ", surname =" + getSurname() +
+                ", email =" + getEmail() +
+                ", age =" + getAge() + "}'";
     }
 }

@@ -3,21 +3,21 @@ package labaSolvd.JacoLuna.Classes;
 import java.util.Objects;
 
 public abstract class People {
-    private long idPeople;
-    private String name;
-    private String surname;
-    private String Email;
-    private int age;
+    protected long idPeople;
+    protected String name;
+    protected String surname;
+    protected String Email;
+    protected int age;
 
+    public People() {}
     public People(long idPeople, String name, String surname, String email, int age) {
         this(name, surname, email, age);
-        idPeople = idPeople;
+        this.idPeople = idPeople;
     }
     public People(String name, String surname, String email, int age) {
-        idPeople = idPeople;
         this.name = name;
         this.surname = surname;
-        Email = email;
+        this.Email = email;
         this.age = age;
     }
 
@@ -35,6 +35,19 @@ public abstract class People {
     }
     public int getAge() {
         return age;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+    public void setEmail(String email) {
+        Email = email;
+    }
+    public void setAge(int age) {
+        this.age = age;
     }
 
     @Override

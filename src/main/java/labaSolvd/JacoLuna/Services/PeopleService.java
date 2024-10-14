@@ -9,8 +9,8 @@ import java.util.Map;
 public class PeopleService {
     private final PeopleDAO peopleDAO;
 
-    public PeopleService(PeopleDAO peopleDAO) {
-        this.peopleDAO = peopleDAO;
+    public PeopleService() {
+        this.peopleDAO = new PeopleDAO();
     }
 
     public Long add(String name, String surname, String email, int age){
