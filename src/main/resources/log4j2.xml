@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Console appender for printing to the console -->
+        <!--LOGGER = LogManager.getLogger(Logger.class)-->
+        <Console name="Console" target="SYSTEM_OUT">
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>-->
+            <PatternLayout pattern="%m%n"/>
+        </Console>
+        <!--CONSOLE_ERROR = LogManager.getLogger("ConsoleErrorLogger")-->
+        <Console name="ConsoleError" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss} %-5p - %m%n"/>
+        </Console>
+        <!-- File appender for saving logs to a file -->
+        <!--LOGGER = LogManager.getLogger(Logger.class)
+            FILE = LogManager.getLogger("FileOnlyLogger")-->
+        <File name="FileLogger" fileName="logs/app.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="ConsoleErrorLogger" level="debug" additivity="false">
+            <AppenderRef ref="ConsoleError"/>
+        </Logger>
+        <Logger name="ConsoleLogger" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="FileOnlyLogger" level="info" additivity="false">
+            <AppenderRef ref="FileLogger"/>
+        </Logger>
+        <Root level="debug">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="FileLogger"/>
+        </Root>
+    </Loggers>
+</Configuration>
