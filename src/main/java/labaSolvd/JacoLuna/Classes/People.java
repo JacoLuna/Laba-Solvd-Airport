@@ -37,6 +37,9 @@ public abstract class People {
         return age;
     }
 
+    public void setIdPeople(long idPeople) {
+        this.idPeople = idPeople;
+    }
     public void setName(String name) {
         this.name = name;
     }

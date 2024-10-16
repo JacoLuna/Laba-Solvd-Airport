@@ -7,6 +7,7 @@ public class CrewMember extends People{
     private String role;
     private int flightHours;
 
+    public CrewMember() {}
     public CrewMember(String name, String surname, String email, int age, String role, int flightHours) {
         super(name, surname, email, age);
         this.role = role;
@@ -29,6 +30,18 @@ public class CrewMember extends People{
 
     public int getFlightHours() {
         return flightHours;
+    }
+
+    public void setIdCrewMember(long idCrewMember) {
+        this.idCrewMember = idCrewMember;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public void setFlightHours(int flightHours) {
+        this.flightHours = flightHours;
     }
 
     @Override

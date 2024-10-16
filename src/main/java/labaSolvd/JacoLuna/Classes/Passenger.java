@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class Passenger extends People{
     private long idPassenger;
-    private Boolean VIP;
+    private boolean VIP;
     private int flightPoints;
-    private Boolean hasSpecialNeeds;
+    private boolean hasSpecialNeeds;
 
     private void initialize(Boolean VIP, int flightPoints, Boolean hasSpecialNeeds) {
         this.VIP = VIP;
@@ -73,7 +73,7 @@ public class Passenger extends People{
 
     @Override
     public int hashCode() {
-        return super.hashCode() + (int)idPassenger + VIP.toString().length() + hasSpecialNeeds.toString().length();
+        return super.hashCode() + (int)idPassenger;
     }
 
     @Override
