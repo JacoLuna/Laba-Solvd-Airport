@@ -17,54 +17,35 @@ public class AirportService {
         menuSrv = new MenuService();
     }
     public void startProgram(){
-        int SourceType, ans, CRUD;
-        do {
-            SourceType = InputService.setInput(menuSrv.initializationMenu(), 2, Integer.class);
-        }while (SourceType != MenuService.InitializationOptions.DATABASE.ordinal() &&
-                SourceType != MenuService.InitializationOptions.XML.ordinal() &&
-                SourceType != MenuService.InitializationOptions.EXIT.ordinal());
-
-        do {
-            ans = InputService.setInput(MenuOptions.printMenu(), MenuOptions.values().length, Integer.class);
-            switch (MenuOptions.values()[ans]){
-                case MenuOptions.PEOPLE -> {
-                    ans = InputService.setInput(menuSrv.peopleMenu(), MenuOptions.PEOPLE.ordinal(), 2, Integer.class);
-                    CRUD = InputService.setInput(EntityOptions.printMenu(), EntityOptions.values().length, Integer.class);
-                    switch (EntityOptions.values()[CRUD]){
-                        case SEE_ALL ->{
+        int ans, CRUD;
+        int sourceIndex = InputService.setInput(menuSrv.initializationMenu(), MenuService.InitializationOptions.values().length-1, Integer.class);
+        MenuService.InitializationOptions source = MenuService.InitializationOptions.values()[sourceIndex];
+        if (source == MenuService.InitializationOptions.DATABASE){
+            do {
+                ans = InputService.setInput(MenuOptions.printMenu(), MenuOptions.values().length, Integer.class);
+                switch (MenuOptions.values()[ans]){
+                    case MenuOptions.PEOPLE -> {
+                        ans = InputService.setInput(menuSrv.peopleMenu(), MenuOptions.PEOPLE.ordinal(), 2, Integer.class);
+                        do {
+                            CRUD = InputService.setInput(EntityOptions.printMenu(), EntityOptions.values().length, Integer.class);
                             if (ans == MenuService.peopleOptions.PASSENGER.ordinal()) {
-                                passengerSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}\n", p.toString()));
-                            }else if(ans == MenuService.peopleOptions.CREW_MEMBER.ordinal()){
+                                switch (EntityOptions.values()[CRUD]) {
+                                    case SEE_ALL -> passengerSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}\n", p.toString()));
+                                    case CREATE -> passengerSrv.add();
+                                    case DELETE -> passengerSrv.delete();
+                                    case UPDATE -> passengerSrv.update();
+                                    case SEARCH -> passengerSrv.search().forEach(p -> Utils.CONSOLE.info("{}\n", p.toString()));
+                                    case GET_ONE -> Utils.CONSOLE.info(passengerSrv.getById().toString());
+                                }
+                            }else if (ans == MenuService.peopleOptions.CREW_MEMBER.ordinal()) {
 
                             }
-                        }
-                        case CREATE ->{
-                            if (ans == MenuService.peopleOptions.PASSENGER.ordinal()) {
-                                passengerSrv.add();
-                            }else if(ans == MenuService.peopleOptions.CREW_MEMBER.ordinal()){
-
-                            }
-                        }
-                        case DELETE ->{
-                            if (ans == MenuService.peopleOptions.PASSENGER.ordinal()) {
-                                passengerSrv.delete();
-                            }else if(ans == MenuService.peopleOptions.CREW_MEMBER.ordinal()){
-
-                            }
-                        }
-                        case UPDATE -> {
-                            if (ans == MenuService.peopleOptions.PASSENGER.ordinal()) {
-                                passengerSrv.update();
-                            }else if(ans == MenuService.peopleOptions.CREW_MEMBER.ordinal()){
-
-                            }
-                        }
+                        }while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
                     }
-
+                    case CLASS -> {}
                 }
-                case CLASS -> {}
-            }
-        }while (ans != MenuOptions.END_SESSION.ordinal());
+            }while (ans != MenuOptions.END_SESSION.ordinal());
+        }
     }
 
 

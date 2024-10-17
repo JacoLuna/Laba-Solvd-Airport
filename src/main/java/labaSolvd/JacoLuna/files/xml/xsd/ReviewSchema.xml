@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<xsd:schema xmlns:xsdi="http://www.w3.org/2001/XMLSchema-instance" attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:element name="Reviews" >
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element maxOccurs="unbounded" name="Review">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="rating" type="xsd:integer" />
+                            <xsd:element name="comment" type="xsd:string" />
+                        </xsd:sequence>
+                        <xsd:attribute name="idReview" type="xsd:long" use="required" />
+                        <xsd:attribute name="idFlight" type="xsd:long" use="required" />
+                        <xsd:attribute name="idPassenger" type="xsd:long" use="required" />
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

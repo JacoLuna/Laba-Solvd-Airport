@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
+<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:element name="Planes">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element maxOccurs="unbounded" name="Plane">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="fuelCapacity" type="xsd:integer" />
+                            <xsd:element name="tripulationSize" type="xsd:integer" />
+                            <xsd:element name="economySize" type="xsd:integer" />
+                            <xsd:element name="premiumSize" type="xsd:integer" />
+                            <xsd:element name="buinessSize" type="xsd:integer" />
+                            <xsd:element name="firstClassSize" type="xsd:integer" />
+                            <xsd:element name="country" type="xsd:string" />
+                        </xsd:sequence>
+                        <xsd:attribute name="idPlane" type="xsd:string" use="required" />
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

@@ -6,6 +6,7 @@ public enum EntityOptions {
     GET_ONE,
     UPDATE,
     DELETE,
+    SEARCH,
     EXIT;
 
     public static String printMenu(){

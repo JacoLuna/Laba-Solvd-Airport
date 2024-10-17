@@ -1,8 +1,9 @@
 package labaSolvd.JacoLuna.Connection;
 
-import labaSolvd.JacoLuna.Services.DataBaseService;
+import labaSolvd.JacoLuna.Utils;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -18,8 +19,12 @@ public class ConnectionPool {
 
     private void initializePool() {
         for (int i = 0; i < INITIAL_CAPACITY; i++) {
-            Connection connection = DataBaseService.getConnection();
-            connections.offer(connection);
+            try {
+                Connection connection = DataBaseConnection.getConnection();
+                connections.offer(connection);
+            }catch (SQLException e) {
+                Utils.CONSOLE_ERROR.error("Error in initializing pool");
+            }
         }
     }
     public void releaseConnection(Connection connection) {

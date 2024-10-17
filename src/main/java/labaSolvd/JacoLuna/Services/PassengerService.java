@@ -1,5 +1,6 @@
 package labaSolvd.JacoLuna.Services;
 
+import jdk.jshell.execution.Util;
 import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.People;
 import labaSolvd.JacoLuna.DAO.PassengerDAO;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 public class PassengerService {
 
     private final PassengerDAO passengerDAO;
-    private PeopleService peopleService;
+    private final PeopleService peopleService;
 
     public PassengerService() {
         this.passengerDAO = new PassengerDAO();
@@ -28,8 +29,8 @@ public class PassengerService {
         String surname = InputService.stringAns("Please enter your surname: ");
         String email = InputService.stringAns("Please enter your email: ");
         int age = InputService.setInput("Please enter your age: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.class);
-        boolean VIP = InputService.setInput("Is " + name + " VIP?\n0 - No\n1 - Yes\n", Arrays.asList(0, 1), Integer.class) == 1;
-        boolean hasSpecialNeeds = InputService.setInput("Does " + name + " have special needs?\n0 - No\n1 - Yes\n", Arrays.asList(0, 1), Integer.class) == 1;
+        boolean VIP = InputService.booleanAns("Is " + name + " VIP?");
+        boolean hasSpecialNeeds = InputService.booleanAns("Does " + name + " have special needs?");
         add(name, surname, email, age, VIP, 0, hasSpecialNeeds);
     }
     public void add(String name, String surname, String email, int age, boolean VIP, int flightPoints, boolean hasSpecialNeeds){
@@ -41,8 +42,8 @@ public class PassengerService {
         }
     }
 
-    public Passenger getById(long id){
-        return passengerDAO.getById(id);
+    public Passenger getById(){
+        return passengerDAO.getById(selectPassengerId());
     }
 
     public boolean delete(){
@@ -60,13 +61,54 @@ public class PassengerService {
     }
 
     public void update() {
-        Passenger passenger = getById( selectPassengerId() );
+        Passenger passenger = getById();
         updatePassengerAttributes(passenger);
         try {
             passengerDAO.update(passenger);
         } catch (Exception e) {
             Utils.CONSOLE.error("Error while updating passenger: {}", e.getMessage());
         }
+    }
+
+    public List<Passenger> search(){
+        List<Field> attributes = getPassengerAttributes();
+        List<Passenger> passengers = new ArrayList<>();
+        try {
+            Object value;
+            int attIndex = selectAtt(attributes);
+
+            if (attributes.get(attIndex).getType().equals(String.class)){
+                value = InputService.stringAns("Please enter the search value");
+                passengers = passengerDAO.search(attributes.get(attIndex).getName(),(String) value);
+            }else {
+
+                Class<?> fieldType = attributes.get(attIndex).getType();
+                Utils.CONSOLE.info(fieldType.getName());
+                value = switch (fieldType.getName()){
+                    case "int" -> InputService.setInput("Please enter the search value", Integer.class);
+                    case "double" -> InputService.setInput("Please enter the search value", Double.class);
+                    case "float" -> InputService.setInput("Please enter the search value", Float.class);
+                    case "boolean" -> InputService.booleanAns("is the value true?");
+                    default -> null;
+                };
+                if (value != null)
+                    passengers = passengerDAO.search(attributes.get(attIndex).getName(), value);
+            }
+        } catch (Exception e) {
+            Utils.CONSOLE.error("Error while searching passengers: {}", e.getMessage());
+        }
+        return passengers;
+    }
+
+    private int selectAtt(List<Field> attributes){
+        int ans;
+        StringBuilder sb = new StringBuilder("Select an attribute\n");
+        for (int i = 1; i < attributes.size(); i++) {
+            sb.append("\n").append(i).append(" ").append(attributes.get(i).getName());
+        }
+        sb.append("\n").append(attributes.size()).append(" none\n");
+        ans = InputService.setInput(sb.toString(), attributes.size(), Integer.class);
+        return ans;
     }
 
     private long selectPassengerId() {
@@ -85,12 +127,7 @@ public class PassengerService {
         List<Field> attributes = getPassengerAttributes();
         int ans;
         do {
-            StringBuilder sb = new StringBuilder("Select attribute to change\n");
-            for (int i = 1; i < attributes.size(); i++) {
-                sb.append("\n").append(i).append(" ").append(attributes.get(i).getName());
-            }
-            sb.append("\n").append(attributes.size()).append(" none\n");
-            ans = InputService.setInput(sb.toString(), attributes.size(), Integer.class);
+            ans = selectAtt(attributes);
             if (ans < attributes.size()) {
                 updateAttribute(passenger, attributes.get(ans));
             }

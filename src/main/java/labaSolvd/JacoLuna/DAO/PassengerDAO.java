@@ -5,6 +5,7 @@ import labaSolvd.JacoLuna.Connection.ConnectionPool;
 import labaSolvd.JacoLuna.Connection.ReusableConnection;
 import labaSolvd.JacoLuna.Interfaces.IDAO;
 import labaSolvd.JacoLuna.Utils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -74,11 +75,13 @@ public class PassengerDAO implements IDAO<Passenger> {
 
             try(ResultSet generatedKeys = ps.executeQuery()) {
                 if (generatedKeys.next()) {
+
                     id = generatedKeys.getLong(1);
                     Boolean VIP = generatedKeys.getBoolean(2);
                     int flightPoints = generatedKeys.getInt(3);
                     Boolean hasSpecialNeeds = generatedKeys.getBoolean(4);
                     long idPerson = generatedKeys.getLong(5);
+
                     try (PreparedStatement subPs = conn.prepareStatement(GET_PEOPLE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
                         subPs.setLong(1, idPerson);
                         try(ResultSet subGeneratedKeys = subPs.executeQuery()) {
@@ -177,5 +180,40 @@ public class PassengerDAO implements IDAO<Passenger> {
             Utils.CONSOLE_ERROR.error(e);
         }
         return result;
+    }
+    public List<Passenger> search(String column, String value) {
+        String GET_CONDITIONS_STRING_PASSENGER_QUERY = "SELECT * FROM passenger as pas " +
+                "INNER JOIN people as peo ON pas.idPeople = peo.idPeople WHERE " + column + " LIKE ?";
+        return executeSearch("%" + value + "%", String.class, GET_CONDITIONS_STRING_PASSENGER_QUERY);
+    }
+    public <T> List<Passenger> search(String column, T value) {
+        String GET_CONDITIONS_NUMBER_PASSENGER_QUERY = "SELECT * FROM passenger as pas " +
+                "INNER JOIN people as peo ON pas.idPeople = peo.idPeople WHERE " + column + " = ?";
+        return executeSearch(value, (Class)value.getClass(), GET_CONDITIONS_NUMBER_PASSENGER_QUERY);
+    }
+    private <T> List<Passenger> executeSearch(T value, Class<T> type, String query) {
+        List<Passenger> passengers = new ArrayList<>();
+        try(ReusableConnection conn = POOL.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            switch (type.getSimpleName()){
+                case "Integer" -> ps.setInt(1, Integer.parseInt(value.toString()));
+                case "Float" -> ps.setFloat(1, Float.parseFloat(value.toString()));
+                case "Long" -> ps.setLong(1, Long.parseLong(value.toString()));
+                case "Double" -> ps.setDouble(1, Double.parseDouble(value.toString()));
+                case "Boolean" -> ps.setBoolean(1, Boolean.parseBoolean(value.toString()));
+                case "String" -> ps.setString(1, value.toString());
+            }
+            try(ResultSet generatedKeys = ps.executeQuery()) {
+                while (generatedKeys.next()) {
+                    long idPerson = generatedKeys.getLong(5);
+                    passengers.add(getById(idPerson));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Couldn't find Passengers", e);
+        } catch (Exception e) {
+            Utils.CONSOLE_ERROR.error(e);
+        }
+        return passengers;
     }
 }

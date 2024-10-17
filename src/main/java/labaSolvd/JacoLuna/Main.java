@@ -1,10 +1,12 @@
 package labaSolvd.JacoLuna;
-import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.People;
+import labaSolvd.JacoLuna.Classes.Plane;
+import labaSolvd.JacoLuna.Classes.Review;
 import labaSolvd.JacoLuna.Services.AirportService;
-import labaSolvd.JacoLuna.Services.SaxParserService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import labaSolvd.JacoLuna.files.xml.Parsers.PeopleSaxParser;
+import labaSolvd.JacoLuna.files.xml.Parsers.PlaneSaxParser;
+import labaSolvd.JacoLuna.files.xml.Parsers.ReviewSaxParser;
+import labaSolvd.JacoLuna.files.xml.XMLValidator;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,17 +21,27 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
 
-        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+/*        boolean isValid = XMLValidator.validateXML(
+                "src\\main\\java\\labaSolvd\\JacoLuna\\files\\xml\\Planes.xml",
+                "src\\main\\java\\labaSolvd\\JacoLuna\\files\\xml\\xsd\\PlaneSchema.xml");
+
+        if (isValid)
+            Utils.CONSOLE.info("is valid");
+        else
+            Utils.CONSOLE.info("is not valid");*/
+
+        /*SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
         try {
             SAXParser saxParser = saxParserFactory.newSAXParser();
-            SaxParserService handler = new SaxParserService();
-            saxParser.parse(new File("D:\\Jaco\\solv course\\xmlFiles\\passengers.xml"), handler);
-            List<People> empList = handler.getEmpList();
-            for(People emp : empList)
+            ReviewSaxParser handler = new ReviewSaxParser();
+            saxParser.parse(new File("src\\main\\java\\labaSolvd\\JacoLuna\\files\\xml\\Reviews.xml"), handler);
+            List<Review> empList = handler.getEmpList();
+            for(Review emp : empList)
                 System.out.println(emp);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
 
         AirportService airportService = new AirportService();
         airportService.startProgram();

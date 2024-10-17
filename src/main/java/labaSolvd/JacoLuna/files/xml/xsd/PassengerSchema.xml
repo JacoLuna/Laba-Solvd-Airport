@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:complexType name="People" abstract="true">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string"/>
+			<xsd:element name="Surname" type="xsd:string"/>
+			<xsd:element name="Email" type="xsd:string"/>
+            <xsd:element name="Age" type="xsd:integer"/>
+		</xsd:sequence>
+        <xsd:attribute name="idPeople" type="xsd:long" use="required"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="Passenger">
+		<xsd:complexContent>
+			<xsd:extension base="People">
+				<xsd:sequence>
+                    <xsd:element name="VIP" type="xsd:boolean"/>
+                    <xsd:element name="flightPoints" type="xsd:float"/>
+                    <xsd:element name="hasSpecialNeeds" type="xsd:boolean"/>
+				</xsd:sequence>
+                <xsd:attribute name="idPassenger" type="xsd:long" use="required"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="CrewMember">
+		<xsd:complexContent>
+			<xsd:extension base="People">
+				<xsd:sequence>
+                    <xsd:element name="role" type="xsd:string"/>
+				    <xsd:element name="flightHours" type="xsd:integer"/>
+				</xsd:sequence>
+                <xsd:attribute name="idCrewMember" type="xsd:long" use="required"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="AirportData">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="People" type="People" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

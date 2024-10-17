@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AirportData xsi:noNamespaceSchemaLocation="schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <People xsi:type="CrewMember" idCrewMember="1" idPeople="6">
+    <Name>Sarah</Name>
+    <Surname>Wilson</Surname>
+    <Email>""</Email>
+    <Age>20</Age>
+    <role>Co-Pilot</role>
+    <flightHours>2600</flightHours>
+  </People>
+  <People xsi:type="Passenger" idPassenger="1" idPeople="1">
+    <Name>John</Name>
+    <Surname>Doe</Surname>
+    <Email>""</Email>
+    <Age>20</Age>
+    <VIP>1</VIP>
+    <flightPoints>5000</flightPoints>
+    <hasSpecialNeeds>0</hasSpecialNeeds>
+  </People>
+  <People xsi:type="Passenger" idPassenger="2" idPeople="2">
+    <Name>Jane</Name>
+    <Surname>Smith</Surname>
+    <Email>""</Email>
+    <Age>20</Age>
+    <VIP>0</VIP>
+    <flightPoints>1200</flightPoints>
+    <hasSpecialNeeds>0</hasSpecialNeeds>
+  </People>
+</AirportData>

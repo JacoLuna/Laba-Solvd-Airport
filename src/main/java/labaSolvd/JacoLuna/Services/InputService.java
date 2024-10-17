@@ -1,11 +1,13 @@
 package labaSolvd.JacoLuna.Services;
 
 import labaSolvd.JacoLuna.Exceptions.MenuException;
+import labaSolvd.JacoLuna.Utils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -58,6 +60,23 @@ public class InputService {
         } while (!isValid);
         return answer;
     }
+    public static <T extends Number> T setInput(String prompt, Class<T> type){
+        T answer = null;
+        boolean isValid = false;
+        do {
+            CONSOLE.info(prompt);
+            try {
+                answer = readAnswer(type);
+                isValid = true;
+            }catch (InputMismatchException e){
+                CONSOLE_ERROR.error(e);
+                keyboard.nextLine();
+            }catch (Exception e){
+                LOGGER.error(e);
+            }
+        } while (!isValid);
+        return answer;
+    }
 
     public static <T extends Number> T setInput(String prompt, T maxValue, Class<T> type){
         T answer = null;
@@ -80,7 +99,6 @@ public class InputService {
         return answer;
     }
     public static <T extends Number> T readAnswer(Class<T> type){
-        T answer = null;
         return switch (type.getSimpleName()) {
             case "Integer" -> type.cast(keyboard.nextInt());
             case "Float" -> type.cast(keyboard.nextFloat());
@@ -89,12 +107,16 @@ public class InputService {
             default -> throw new IllegalArgumentException("Unsupported type: " + type);
         };
     }
+
+    public static boolean booleanAns(String prompt) {
+        return InputService.setInput(prompt + "\n0 - No\n1 - Yes\n", Arrays.asList(0, 1), Integer.class) == 1;
+    }
     public static String stringAns(String prompt){
-        System.out.println(prompt);
+        Utils.CONSOLE.info(prompt);
         return keyboard.next();
     }
     public static LocalDate readValidDate(String prompt) {
-        System.out.println(prompt);
+        Utils.CONSOLE.info(prompt);
         return readValidDate();
     }
     public static LocalDate readValidDate() {
@@ -110,7 +132,7 @@ public class InputService {
                 date = LocalDate.of(year, month, day);
                 validDate = true;
             } catch (DateTimeException | IllegalArgumentException e) {
-                System.out.println("Invalid date. Please try again.");
+                Utils.CONSOLE.info("Invalid date. Please try again.");
             }
         }
         return date;
