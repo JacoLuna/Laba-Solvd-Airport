@@ -1,30 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Planes xsi:noNamespaceSchemaLocation="schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Plane idPlane="1001">
-        <fuelCapacity>5000</fuelCapacity>
-        <tripulationSize>10</tripulationSize>
-        <economySize>150</economySize>
-        <premiumSize>10</premiumSize>
-        <businessSize>15</businessSize>
-        <firstClassSize>5</firstClassSize>
-        <country>USA</country>
-    </Plane>
-    <Plane idPlane="1002">
-        <fuelCapacity>7000</fuelCapacity>
-        <tripulationSize>12</tripulationSize>
-        <economySize>180</economySize>
-        <premiumSize>15</premiumSize>
-        <businessSize>20</businessSize>
-        <firstClassSize>5</firstClassSize>
-        <country>Germany</country>
-    </Plane>
-    <Plane idPlane="1003">
-        <fuelCapacity>9000</fuelCapacity>
-        <tripulationSize>16</tripulationSize>
-        <economySize>240</economySize>
-        <premiumSize>20</premiumSize>
-        <businessSize>40</businessSize>
-        <firstClassSize>20</firstClassSize>
-        <country>Japan</country>
-    </Plane>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Planes>
+    <Planes idPlane="1001" fuelCapacity="5000" tripulationSize="10" economySize="150" premiumSize="10" businessSize="15" firstClassSize="5" country="USA"/>
+    <Planes idPlane="1002" fuelCapacity="7000" tripulationSize="12" economySize="180" premiumSize="15" businessSize="20" firstClassSize="5" country="Germany"/>
+    <Planes idPlane="1003" fuelCapacity="9000" tripulationSize="16" economySize="240" premiumSize="20" businessSize="40" firstClassSize="20" country="Japan"/>
+    <Planes idPlane="1004" fuelCapacity="6000" tripulationSize="11" economySize="170" premiumSize="12" businessSize="15" firstClassSize="3" country="Brazil"/>
+    <Planes idPlane="1005" fuelCapacity="8000" tripulationSize="14" economySize="200" premiumSize="18" businessSize="25" firstClassSize="7" country="France"/>
+    <Planes idPlane="1006" fuelCapacity="4500" tripulationSize="8" economySize="120" premiumSize="8" businessSize="10" firstClassSize="5" country="Canada"/>
+    <Planes idPlane="1007" fuelCapacity="5500" tripulationSize="10" economySize="140" premiumSize="10" businessSize="15" firstClassSize="5" country="Australia"/>
+    <Planes idPlane="1008" fuelCapacity="6500" tripulationSize="12" economySize="170" premiumSize="12" businessSize="18" firstClassSize="10" country="UK"/>
+    <Planes idPlane="1009" fuelCapacity="7500" tripulationSize="13" economySize="190" premiumSize="15" businessSize="20" firstClassSize="5" country="China"/>
+    <Planes idPlane="1010" fuelCapacity="8500" tripulationSize="15" economySize="220" premiumSize="18" businessSize="30" firstClassSize="10" country="India"/>
 </Planes>

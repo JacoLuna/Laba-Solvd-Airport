@@ -1,15 +1,28 @@
 package labaSolvd.JacoLuna.Classes;
 
+import jakarta.xml.bind.annotation.*;
+
 import java.util.Objects;
 
+@XmlRootElement(name = "Plane")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Plane {
+    //    @XmlElementRef(name="contacts", type=Plane.class)
+    @XmlAttribute(name = "idPlane")
     private String idPlane;
+    @XmlAttribute(name = "fuelCapacity")
     private int fuelCapacity;
+    @XmlAttribute(name = "tripulationSize")
     private int tripulationSize;
+    @XmlAttribute(name = "economySize")
     private int economySize;
+    @XmlAttribute(name = "premiumSize")
     private int premiumSize;
+    @XmlAttribute(name = "businessSize")
     private int businessSize;
+    @XmlAttribute(name = "firstClassSize")
     private int firstClassSize;
+    @XmlAttribute(name = "country")
     private String country;
 
     public Plane() {

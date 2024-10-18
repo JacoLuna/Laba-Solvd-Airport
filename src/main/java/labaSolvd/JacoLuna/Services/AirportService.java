@@ -1,8 +1,11 @@
 package labaSolvd.JacoLuna.Services;
 
+import jakarta.xml.bind.JAXBException;
+import labaSolvd.JacoLuna.DAO.PlaneDAO;
 import labaSolvd.JacoLuna.Enums.EntityOptions;
 import labaSolvd.JacoLuna.Enums.MenuOptions;
 import labaSolvd.JacoLuna.Utils;
+import labaSolvd.JacoLuna.files.xml.xmlLists.Planes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,12 +14,28 @@ public class AirportService {
 
     Map<Integer, Runnable> menuActions = new HashMap<>();
     PassengerService passengerSrv;
+    PlaneService planeSrv;
     MenuService menuSrv;
     public AirportService() {
         passengerSrv = new PassengerService();
+        planeSrv = new PlaneService();
         menuSrv = new MenuService();
     }
     public void startProgram(){
+        Planes planes = new Planes();
+        planes.setPlanes(planeSrv.getAll());
+
+        try {
+            MarshallListPlane.MarshallListPlane(planes);
+        }catch (JAXBException e) {
+            Utils.CONSOLE_ERROR.error(e);
+        }
+/*        try {
+            MarshallListPlane.UnMarshallListPlane();
+        }catch (JAXBException e) {
+            Utils.CONSOLE_ERROR.error(e);
+        }*/
+        /*
         int ans, CRUD;
         int sourceIndex = InputService.setInput(menuSrv.initializationMenu(), MenuService.InitializationOptions.values().length-1, Integer.class);
         MenuService.InitializationOptions source = MenuService.InitializationOptions.values()[sourceIndex];
@@ -45,7 +64,7 @@ public class AirportService {
                     case CLASS -> {}
                 }
             }while (ans != MenuOptions.END_SESSION.ordinal());
-        }
+        }*/
     }
 
 
