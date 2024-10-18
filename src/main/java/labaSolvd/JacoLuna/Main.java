@@ -1,23 +1,5 @@
 package labaSolvd.JacoLuna;
-import jakarta.xml.bind.JAXBException;
-import jdk.jshell.execution.Util;
-import labaSolvd.JacoLuna.Classes.People;
-import labaSolvd.JacoLuna.Classes.Plane;
-import labaSolvd.JacoLuna.Classes.Review;
 import labaSolvd.JacoLuna.Services.AirportService;
-import labaSolvd.JacoLuna.Services.MarshallListPlane;
-import labaSolvd.JacoLuna.files.xml.Parsers.PeopleSaxParser;
-import labaSolvd.JacoLuna.files.xml.Parsers.PlaneSaxParser;
-import labaSolvd.JacoLuna.files.xml.Parsers.ReviewSaxParser;
-import labaSolvd.JacoLuna.files.xml.XMLValidator;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.

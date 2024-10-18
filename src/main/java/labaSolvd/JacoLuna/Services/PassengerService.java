@@ -4,6 +4,7 @@ import jdk.jshell.execution.Util;
 import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.People;
 import labaSolvd.JacoLuna.DAO.PassengerDAO;
+import labaSolvd.JacoLuna.Interfaces.IService;
 import labaSolvd.JacoLuna.Utils;
 
 import java.awt.*;
@@ -15,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class PassengerService {
+public class PassengerService implements IService<Passenger> {
 
     private final PassengerDAO passengerDAO;
     private final PeopleService peopleService;

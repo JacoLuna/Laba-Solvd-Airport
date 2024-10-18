@@ -1,4 +1,4 @@
-package labaSolvd.JacoLuna.files.xml.Parsers;
+package labaSolvd.JacoLuna.files.Parsers;
 
 import labaSolvd.JacoLuna.Classes.CrewMember;
 import labaSolvd.JacoLuna.Classes.Passenger;

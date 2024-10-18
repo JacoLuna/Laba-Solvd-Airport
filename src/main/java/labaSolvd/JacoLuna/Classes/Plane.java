@@ -10,19 +10,19 @@ public class Plane {
     //    @XmlElementRef(name="contacts", type=Plane.class)
     @XmlAttribute(name = "idPlane")
     private String idPlane;
-    @XmlAttribute(name = "fuelCapacity")
+    @XmlElement(name = "fuelCapacity")
     private int fuelCapacity;
-    @XmlAttribute(name = "tripulationSize")
+    @XmlElement(name = "tripulationSize")
     private int tripulationSize;
-    @XmlAttribute(name = "economySize")
+    @XmlElement(name = "economySize")
     private int economySize;
-    @XmlAttribute(name = "premiumSize")
+    @XmlElement(name = "premiumSize")
     private int premiumSize;
-    @XmlAttribute(name = "businessSize")
+    @XmlElement(name = "businessSize")
     private int businessSize;
-    @XmlAttribute(name = "firstClassSize")
+    @XmlElement(name = "firstClassSize")
     private int firstClassSize;
-    @XmlAttribute(name = "country")
+    @XmlElement(name = "country")
     private String country;
 
     public Plane() {

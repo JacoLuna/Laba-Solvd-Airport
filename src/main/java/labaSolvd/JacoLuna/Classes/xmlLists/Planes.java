@@ -1,4 +1,4 @@
-package labaSolvd.JacoLuna.files.xml.xmlLists;
+package labaSolvd.JacoLuna.Classes.xmlLists;
 
 import jakarta.xml.bind.annotation.*;
 import labaSolvd.JacoLuna.Classes.Plane;
