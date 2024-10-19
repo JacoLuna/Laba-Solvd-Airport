@@ -1,0 +1,25 @@
+{
+  "Luggages": [
+    {
+      "idLuggage": "1",
+      "idPassenger": "1",
+      "idFlight": "1",
+      "size": "20.5",
+      "onCabin": 1
+    },
+    {
+      "idLuggage": "2",
+      "idPassenger": "2",
+      "idFlight": "2",
+      "size": "15",
+      "onCabin": 0
+    },
+    {
+      "idLuggage": "3",
+      "idPassenger": "3",
+      "idFlight": "3",
+      "size": "10",
+      "onCabin": 1
+    }
+  ]
+}

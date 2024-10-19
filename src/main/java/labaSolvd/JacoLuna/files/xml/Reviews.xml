@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Reviews xsi:noNamespaceSchemaLocation="schema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Review idReview="1" idFlight="1" idPassenger="1">
-        <rating>5</rating>
-        <comment>Great flight</comment>
-    </Review>
-</Reviews>

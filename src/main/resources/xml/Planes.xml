@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Planes>
+    <Plane idPlane="C123">
+        <fuelCapacity>150000</fuelCapacity>
+        <tripulationSize>4</tripulationSize>
+        <economySize>45</economySize>
+        <premiumSize>5</premiumSize>
+        <businessSize>0</businessSize>
+        <firstClassSize>0</firstClassSize>
+        <country>Argentina</country>
+    </Plane>
+    <Plane idPlane="B123">
+        <fuelCapacity>300000</fuelCapacity>
+        <tripulationSize>8</tripulationSize>
+        <economySize>120</economySize>
+        <premiumSize>100</premiumSize>
+        <businessSize>60</businessSize>
+        <firstClassSize>20</firstClassSize>
+        <country>China</country>
+    </Plane>
+</Planes>

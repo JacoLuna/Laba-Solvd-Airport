@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Reviews>
+    <Review idReview="1" idFlight="1" idPassenger="1">
+        <rating>5</rating>
+        <comment>Great flight</comment>
+    </Review>
+    <Review idReview="2" idFlight="2" idPassenger="2">
+        <rating>5</rating>
+        <comment>epic</comment>
+    </Review>
+</Reviews>

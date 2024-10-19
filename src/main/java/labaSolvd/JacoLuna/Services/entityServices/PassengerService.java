@@ -1,15 +1,12 @@
-package labaSolvd.JacoLuna.Services;
+package labaSolvd.JacoLuna.Services.entityServices;
 
-import jdk.jshell.execution.Util;
 import labaSolvd.JacoLuna.Classes.Passenger;
-import labaSolvd.JacoLuna.Classes.People;
 import labaSolvd.JacoLuna.DAO.PassengerDAO;
 import labaSolvd.JacoLuna.Interfaces.IService;
+import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
 
-import java.awt.*;
 import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;

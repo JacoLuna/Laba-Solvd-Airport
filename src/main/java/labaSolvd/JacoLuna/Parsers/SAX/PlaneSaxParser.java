@@ -1,6 +1,5 @@
-package labaSolvd.JacoLuna.files.Parsers;
+package labaSolvd.JacoLuna.Parsers.SAX;
 
-import labaSolvd.JacoLuna.Classes.CrewMember;
 import labaSolvd.JacoLuna.Classes.Plane;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

@@ -11,7 +11,7 @@
                             <xsd:element name="tripulationSize" type="xsd:integer" />
                             <xsd:element name="economySize" type="xsd:integer" />
                             <xsd:element name="premiumSize" type="xsd:integer" />
-                            <xsd:element name="buinessSize" type="xsd:integer" />
+                            <xsd:element name="businessSize" type="xsd:integer" />
                             <xsd:element name="firstClassSize" type="xsd:integer" />
                             <xsd:element name="country" type="xsd:string" />
                         </xsd:sequence>

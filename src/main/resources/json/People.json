@@ -1,0 +1,36 @@
+{
+  "People": [
+    {
+      "idCrewMember": 1,
+      "idPeople": 6,
+      "Name": "Sarah",
+      "Surname": "Wilson",
+      "Email": "",
+      "Age": 20,
+      "role": "Co-Pilot",
+      "flightHours": 2600
+    },
+    {
+      "idPassenger": 1,
+      "idPeople": 1,
+      "Name": "John",
+      "Surname": "Doe",
+      "Email": "",
+      "Age": 20,
+      "VIP": 1,
+      "flightPoints": 5000,
+      "hasSpecialNeeds": 0
+    },
+    {
+      "idPassenger": 2,
+      "idPeople": 2,
+      "Name": "Jane",
+      "Surname": "Smith",
+      "Email": "",
+      "Age": 20,
+      "VIP": 0,
+      "flightPoints": 1200,
+      "hasSpecialNeeds": 0
+    }
+  ]
+}

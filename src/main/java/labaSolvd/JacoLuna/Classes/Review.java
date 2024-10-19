@@ -1,17 +1,26 @@
 package labaSolvd.JacoLuna.Classes;
 
+import jakarta.xml.bind.annotation.*;
+
 import java.util.Objects;
 
+@XmlRootElement(name = "Review")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Review {
+    @XmlAttribute(name = "idReview")
     private long idReview;
+    @XmlAttribute(name = "idFlight")
     private long idFlight;
+    @XmlAttribute(name = "idPassenger")
     private long idPassenger;
+    @XmlElement(name = "rating")
     private int rating;
+    @XmlElement(name = "comment")
     private String comment;
 
     public Review(){
     }
-    public Review(int idReview, int idFlight, int idPassenger, int rating, String comment) {
+    public Review(long idReview, long idFlight, long idPassenger, int rating, String comment) {
         this.idReview = idReview;
         this.idFlight = idFlight;
         this.idPassenger = idPassenger;

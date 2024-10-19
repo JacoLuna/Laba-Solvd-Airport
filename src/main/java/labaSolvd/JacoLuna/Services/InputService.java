@@ -2,6 +2,7 @@ package labaSolvd.JacoLuna.Services;
 
 import labaSolvd.JacoLuna.Exceptions.MenuException;
 import labaSolvd.JacoLuna.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,6 +12,8 @@ import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class InputService {
     private static final Logger LOGGER = LogManager.getLogger(Logger.class);
@@ -23,7 +26,7 @@ public class InputService {
         T answer = null;
         boolean isValid = false;
         do {
-            System.out.print(prompt);
+            Utils.CONSOLE.info("{}",prompt);
             try {
                 answer = readAnswer(type);
                 if (!ansArray.contains(answer)){
@@ -44,7 +47,7 @@ public class InputService {
         T answer = null;
         boolean isValid = false;
         do {
-            CONSOLE.info(prompt);
+            CONSOLE.info("{}[{}-{}]:",prompt, minValue, maxValue);
             try {
                 answer = readAnswer(type);
                 if (answer.doubleValue() < minValue.doubleValue() || answer.doubleValue() > maxValue.doubleValue()) {
@@ -82,7 +85,7 @@ public class InputService {
         T answer = null;
         boolean isValid = false;
         do {
-            CONSOLE.info(prompt);
+            CONSOLE.info("{}",prompt);
             try {
                 answer = readAnswer(type);
                 if (answer.doubleValue() < 0 || answer.doubleValue() > maxValue.doubleValue()) {
@@ -112,8 +115,23 @@ public class InputService {
         return InputService.setInput(prompt + "\n0 - No\n1 - Yes\n", Arrays.asList(0, 1), Integer.class) == 1;
     }
     public static String stringAns(String prompt){
-        Utils.CONSOLE.info(prompt);
+        Utils.CONSOLE.info("{}:",prompt);
         return keyboard.next();
+    }
+    public static String stringAns(String prompt, String pattern){
+        String ans;
+        Pattern p = Pattern.compile(pattern);
+        Matcher m;
+        do {
+            Utils.CONSOLE.info("{}:",prompt);
+            ans = keyboard.nextLine();
+            m = p.matcher(StringUtils.remove(ans,"-"));
+            if (!m.matches()){
+                Utils.CONSOLE.info("Incorrect patter");
+                keyboard.nextLine();
+            }
+        }while (!m.matches());
+        return ans;
     }
     public static LocalDate readValidDate(String prompt) {
         Utils.CONSOLE.info(prompt);

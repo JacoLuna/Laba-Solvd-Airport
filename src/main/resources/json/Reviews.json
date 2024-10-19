@@ -1,0 +1,25 @@
+{
+  "Reviews": [
+    {
+      "idReview":"1",
+      "idFlight":"1",
+      "idPassenger":"1",
+      "rating":"5",
+      "comment":"Great flight!"
+    },
+    {
+      "idReview":"2",
+      "idFlight":"2",
+      "idPassenger":"2",
+      "rating":"4",
+      "comment":"Good service."
+    },
+    {
+      "idReview":"3",
+      "idFlight":"3",
+      "idPassenger":"4",
+      "rating":"4",
+      "comment":"Average experience."
+    }
+  ]
+}

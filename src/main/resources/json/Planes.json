@@ -1,0 +1,34 @@
+{
+  "Planes": [
+    {
+      "idPlane":"1001",
+      "fuelCapacity":"5000",
+      "tripulationSize":"10",
+      "economySize":"150",
+      "premiumSize":"10",
+      "businessSize":"15",
+      "firstClassSize":"5",
+      "country":"USA"
+    },
+    {
+      "idPlane":"1002",
+      "fuelCapacity":"7000",
+      "tripulationSize":"12",
+      "economySize":"180",
+      "premiumSize":"15",
+      "businessSize":"20",
+      "firstClassSize":"5",
+      "country":"Germany"
+    },
+    {
+      "idPlane":"1003",
+      "fuelCapacity":"9000",
+      "tripulationSize":"16",
+      "economySize":"240",
+      "premiumSize":"20",
+      "businessSize":"40",
+      "firstClassSize":"20",
+      "country":"Japan"
+    }
+  ]
+}

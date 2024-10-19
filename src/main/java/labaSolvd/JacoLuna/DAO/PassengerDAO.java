@@ -181,6 +181,7 @@ public class PassengerDAO implements IDAO<Passenger> {
         }
         return result;
     }
+
     public List<Passenger> search(String column, String value) {
         String GET_CONDITIONS_STRING_PASSENGER_QUERY = "SELECT * FROM passenger as pas " +
                 "INNER JOIN people as peo ON pas.idPeople = peo.idPeople WHERE " + column + " LIKE ?";

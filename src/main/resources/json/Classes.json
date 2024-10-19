@@ -1,0 +1,32 @@
+{
+  "Classes": [
+    {
+      "idClass": "1",
+      "Name": "Economy",
+      "hasFood": 0,
+      "hasSuplies": 0,
+      "hasSpecialServices": 0
+    },
+    {
+      "idClass": "2",
+      "Name": "Business",
+      "hasFood": 1,
+      "hasSuplies": 0,
+      "hasSpecialServices": 0
+    },
+    {
+      "idClass": "3",
+      "Name": "Premium",
+      "hasFood": 0,
+      "hasSuplies": 1,
+      "hasSpecialServices": 1
+    },
+    {
+      "idClass": "4",
+      "Name": "Premium",
+      "hasFood": 0,
+      "hasSuplies": 1,
+      "hasSpecialServices": 1
+    }
+  ]
+}

@@ -1,6 +1,5 @@
-package labaSolvd.JacoLuna.Services;
+package labaSolvd.JacoLuna.Services.entityServices;
 
-import labaSolvd.JacoLuna.Classes.People;
 import labaSolvd.JacoLuna.DAO.PeopleDAO;
 
 import java.util.HashMap;

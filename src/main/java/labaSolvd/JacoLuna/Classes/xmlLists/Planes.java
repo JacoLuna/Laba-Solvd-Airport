@@ -9,7 +9,7 @@ import java.util.List;
 @XmlRootElement(name = "Planes")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Planes {
-    @XmlElement(name = "Planes")
+    @XmlElement(name = "Plane")
     private List<Plane> planes = null;
     public Planes() {
         planes = new ArrayList<Plane>();
