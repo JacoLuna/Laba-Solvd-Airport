@@ -128,20 +128,17 @@ public class PlaneService implements IService<Plane> {
     }
 
     private String selectPlaneId() {
-        List<Plane> planes = getAll();
         StringBuilder sb = new StringBuilder("Select the code of the plane");
-        List<String> codes = new ArrayList<>();
-        List<Integer> indexes = new ArrayList<>();
-        int i = 0, index;
+        List<Plane> planes = getAll();
+        List<String> codeList = new ArrayList<>();
+        String code;
         for (Plane p : planes) {
-            indexes.add(i);
-            i++;
-            codes.add(p.getIdPlane());
+            codeList.add(p.getIdPlane());
             sb.append("\n").append(p.getIdPlane());
         }
         sb.append("\n");
-        index = InputService.setInput(sb.toString(), indexes, Integer.class);
-        return codes.get(index);
+        code = InputService.stringAns(sb.toString(), codeList);
+        return code;
     }
 
     private void updatePlaneAttributes(Plane plane) {

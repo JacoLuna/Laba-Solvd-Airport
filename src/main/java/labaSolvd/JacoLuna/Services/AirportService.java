@@ -1,12 +1,20 @@
 package labaSolvd.JacoLuna.Services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import labaSolvd.JacoLuna.Classes.Plane;
 import labaSolvd.JacoLuna.Enums.EntityOptions;
 import labaSolvd.JacoLuna.Enums.MenuOptions;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
+import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Services.entityServices.PassengerService;
 import labaSolvd.JacoLuna.Services.entityServices.PlaneService;
 import labaSolvd.JacoLuna.Services.entityServices.ReviewsService;
 import labaSolvd.JacoLuna.Utils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class AirportService {
     PassengerService passengerSrv;
@@ -22,6 +30,10 @@ public class AirportService {
         passengerSrv = new PassengerService();
         planeSrv = new PlaneService(source);
         reviewsSrv = new ReviewsService(source);
+
+        List<Plane> myObjects = JsonParser.unparseToList("src\\main\\resources\\json\\Planes.json", Plane.class);
+        myObjects.forEach(p -> System.out.println(p.toString()));
+
         do {
             ans = InputService.setInput(MenuOptions.printMenu(), MenuOptions.values().length, Integer.class);
             switch (MenuOptions.values()[ans]) {
@@ -62,6 +74,7 @@ public class AirportService {
                         switch (EntityOptions.values()[CRUD]) {
                             case CREATE -> reviewsSrv.add();
                             case SEE_ALL -> reviewsSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case GET_ONE -> Utils.CONSOLE.info(planeSrv.getById().toString());
                         }
                     } while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
                 }

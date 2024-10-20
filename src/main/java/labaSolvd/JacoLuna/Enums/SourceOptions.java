@@ -3,6 +3,7 @@ package labaSolvd.JacoLuna.Enums;
 public enum SourceOptions {
     DATA_BASE,
     XML,
+    JSON,
     EXIT;
     static public String printMenu(){
         StringBuilder sb = new StringBuilder();

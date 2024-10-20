@@ -1,11 +1,16 @@
 package labaSolvd.JacoLuna.Classes;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import jakarta.xml.bind.annotation.*;
 
 import java.util.Objects;
 
 @XmlRootElement(name = "Plane")
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonRootName(value = "Plane")
+@JsonPropertyOrder({"idPlane", "fuelCapacity", "tripulationSize", "economySize", "premiumSize", "businessSize", "firstClassSize", "country"})
 public class Plane {
     //    @XmlElementRef(name="contacts", type=Plane.class)
     @XmlAttribute(name = "idPlane")
@@ -39,34 +44,39 @@ public class Plane {
         this.country = country;
     }
 
+    @JsonGetter("idPlane")
     public String getIdPlane() {
         return idPlane;
     }
 
+    @JsonGetter("fuelCapacity")
     public int getFuelCapacity() {
         return fuelCapacity;
     }
 
+    @JsonGetter("tripulationSize")
     public int getTripulationSize() {
         return tripulationSize;
     }
-
+    @JsonGetter("economySize")
     public int getEconomySize() {
         return economySize;
     }
-
+    @JsonGetter("premiumSize")
     public int getPremiumSize() {
         return premiumSize;
     }
-
+    @JsonGetter("businessSize")
     public int getBusinessSize() {
         return businessSize;
     }
 
+    @JsonGetter("firstClassSize")
     public int getFirstClassSize() {
         return firstClassSize;
     }
 
+    @JsonGetter("country")
     public String getCountry() {
         return country;
     }

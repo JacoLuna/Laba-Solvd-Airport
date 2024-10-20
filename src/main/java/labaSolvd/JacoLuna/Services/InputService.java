@@ -124,13 +124,27 @@ public class InputService {
         Matcher m;
         do {
             Utils.CONSOLE.info("{}:",prompt);
-            ans = keyboard.nextLine();
+            ans = keyboard.next();
             m = p.matcher(StringUtils.remove(ans,"-"));
             if (!m.matches()){
                 Utils.CONSOLE.info("Incorrect patter");
                 keyboard.nextLine();
             }
         }while (!m.matches());
+        return ans;
+    }
+    public static String stringAns(String prompt, List<String> list){
+        String ans;
+        boolean isValid = true;
+        do {
+            Utils.CONSOLE.info("{}",prompt);
+            ans = keyboard.next();
+            if (!list.contains(ans)){
+                Utils.CONSOLE.info("Answer not available");
+                isValid = false;
+                keyboard.nextLine();
+            }
+        }while (!isValid);
         return ans;
     }
     public static LocalDate readValidDate(String prompt) {

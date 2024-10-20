@@ -70,26 +70,25 @@ public class PassengerDAO implements IDAO<Passenger> {
     public Passenger getById(long id) {
         Passenger passenger = null;
         try(ReusableConnection conn = POOL.getConnection();
-            PreparedStatement ps = conn.prepareStatement(GET_PASSENGER_QUERY, Statement.RETURN_GENERATED_KEYS)){
+            PreparedStatement ps = conn.prepareStatement(GET_PASSENGER_QUERY)){
             ps.setLong(1, id);
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
 
-            try(ResultSet generatedKeys = ps.executeQuery()) {
-                if (generatedKeys.next()) {
+                    id = rs.getLong(1);
+                    Boolean VIP = rs.getBoolean(2);
+                    int flightPoints = rs.getInt(3);
+                    Boolean hasSpecialNeeds = rs.getBoolean(4);
+                    long idPerson = rs.getLong(5);
 
-                    id = generatedKeys.getLong(1);
-                    Boolean VIP = generatedKeys.getBoolean(2);
-                    int flightPoints = generatedKeys.getInt(3);
-                    Boolean hasSpecialNeeds = generatedKeys.getBoolean(4);
-                    long idPerson = generatedKeys.getLong(5);
-
-                    try (PreparedStatement subPs = conn.prepareStatement(GET_PEOPLE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+                    try (PreparedStatement subPs = conn.prepareStatement(GET_PEOPLE_QUERY)) {
                         subPs.setLong(1, idPerson);
-                        try(ResultSet subGeneratedKeys = subPs.executeQuery()) {
-                            if (subGeneratedKeys.next()){
-                                String name = subGeneratedKeys.getString(2);
-                                String surname = subGeneratedKeys.getString(3);
-                                String email = subGeneratedKeys.getString(4);
-                                int age = subGeneratedKeys.getInt(5);
+                        try(ResultSet subRs = subPs.executeQuery()) {
+                            if (subRs.next()){
+                                String name = subRs.getString(2);
+                                String surname = subRs.getString(3);
+                                String email = subRs.getString(4);
+                                int age = subRs.getInt(5);
                                 passenger = new Passenger(idPerson, name, surname, email, age, id, VIP, flightPoints, hasSpecialNeeds);
                             }
                         }

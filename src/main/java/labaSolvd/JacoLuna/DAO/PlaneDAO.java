@@ -63,18 +63,19 @@ public class PlaneDAO implements IDAOPlane {
     public Plane getById(String id) {
         Plane plane = null;
         try (ReusableConnection conn = POOL.getConnection();
-             PreparedStatement ps = conn.prepareStatement(GET_PLANE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = conn.prepareStatement(GET_PLANE_QUERY)) {
             ps.setString(1, id);
-            try (ResultSet generatedKeys = ps.executeQuery()) {
-                id = generatedKeys.getString(1);
-                int fuelCapacity = generatedKeys.getInt(2),
-                        tripulationSize = generatedKeys.getInt(3),
-                        economySize = generatedKeys.getInt(4),
-                        premiumSize = generatedKeys.getInt(5),
-                        businessSize = generatedKeys.getInt(6),
-                        firstClassSize = generatedKeys.getInt(7);
-                String country = generatedKeys.getString(8);
-                plane = new Plane(id, fuelCapacity, tripulationSize, economySize, premiumSize, businessSize, firstClassSize, country);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int fuelCapacity = rs.getInt(2),
+                            tripulationSize = rs.getInt(3),
+                            economySize = rs.getInt(4),
+                            premiumSize = rs.getInt(5),
+                            businessSize = rs.getInt(6),
+                            firstClassSize = rs.getInt(7);
+                    String country = rs.getString(8);
+                    plane = new Plane(id, fuelCapacity, tripulationSize, economySize, premiumSize, businessSize, firstClassSize, country);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Couldn't get Plane", e);
@@ -112,19 +113,19 @@ public class PlaneDAO implements IDAOPlane {
     @Override
     public boolean update(Plane plane) {
         boolean result = false;
-        try(ReusableConnection conn = POOL.getConnection();
-            PreparedStatement ps = conn.prepareStatement(UPDATE_PLANE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1,plane.getFuelCapacity());
-            ps.setInt(2,plane.getTripulationSize());
-            ps.setInt(3,plane.getEconomySize());
-            ps.setInt(4,plane.getPremiumSize());
-            ps.setInt(5,plane.getBusinessSize());
-            ps.setInt(6,plane.getFirstClassSize());
-            ps.setString(7,plane.getCountry());
-            if(ps.executeUpdate() == 0) throw new SQLException();
-        }catch (SQLException e) {
+        try (ReusableConnection conn = POOL.getConnection();
+             PreparedStatement ps = conn.prepareStatement(UPDATE_PLANE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, plane.getFuelCapacity());
+            ps.setInt(2, plane.getTripulationSize());
+            ps.setInt(3, plane.getEconomySize());
+            ps.setInt(4, plane.getPremiumSize());
+            ps.setInt(5, plane.getBusinessSize());
+            ps.setInt(6, plane.getFirstClassSize());
+            ps.setString(7, plane.getCountry());
+            if (ps.executeUpdate() == 0) throw new SQLException();
+        } catch (SQLException e) {
             throw new RuntimeException("Couldn't update Plane", e);
-        }catch (Exception e) {
+        } catch (Exception e) {
             Utils.CONSOLE_ERROR.error(e);
         }
         return result;
@@ -135,13 +136,13 @@ public class PlaneDAO implements IDAOPlane {
         boolean result = false;
         Plane plane = getById(id);
         String idPlane = plane.getIdPlane();
-        try(ReusableConnection conn = POOL.getConnection();
-            PreparedStatement ps = conn.prepareStatement(DEL_PLANE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
+        try (ReusableConnection conn = POOL.getConnection();
+             PreparedStatement ps = conn.prepareStatement(DEL_PLANE_QUERY, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, idPlane);
-            if(ps.executeUpdate() == 0) throw new SQLException();
-        }catch (SQLException e) {
+            if (ps.executeUpdate() == 0) throw new SQLException();
+        } catch (SQLException e) {
             throw new RuntimeException("Couldn't delete Passenger", e);
-        }catch (Exception e) {
+        } catch (Exception e) {
             Utils.CONSOLE_ERROR.error(e);
         }
         return result;

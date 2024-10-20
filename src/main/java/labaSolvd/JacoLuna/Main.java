@@ -11,7 +11,7 @@ import java.util.Arrays;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        int ans = 0;
+        int ans;
         boolean isValid;
         String xml, xmlSchema;
         do {

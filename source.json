@@ -1,0 +1,10 @@
+{
+  "idPlane": "1001",
+  "fuelCapacity": 5000,
+  "tripulationSize": 10,
+  "economySize": 150,
+  "premiumSize": 10,
+  "businessSize": 15,
+  "firstClassSize": 5,
+  "country": "USA"
+}
