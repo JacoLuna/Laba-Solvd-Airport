@@ -30,10 +30,6 @@ public class Plane {
     private int firstClassSize;
     @XmlElement(name = "country")
     private String country;
-    private LocalDate departureDate;
-    private LocalDate arrivalDate;
-    private String departureHour;
-    private String arrivalHour;
 
     public Plane() {
     }
@@ -63,14 +59,17 @@ public class Plane {
     public int getTripulationSize() {
         return tripulationSize;
     }
+
     @JsonGetter("economySize")
     public int getEconomySize() {
         return economySize;
     }
+
     @JsonGetter("premiumSize")
     public int getPremiumSize() {
         return premiumSize;
     }
+
     @JsonGetter("businessSize")
     public int getBusinessSize() {
         return businessSize;
@@ -123,7 +122,14 @@ public class Plane {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Plane plane = (Plane) o;
-        return fuelCapacity == plane.fuelCapacity && tripulationSize == plane.tripulationSize && economySize == plane.economySize && premiumSize == plane.premiumSize && businessSize == plane.businessSize && firstClassSize == plane.firstClassSize && Objects.equals(idPlane, plane.idPlane) && Objects.equals(country, plane.country);
+        return fuelCapacity == plane.fuelCapacity &&
+                tripulationSize == plane.tripulationSize &&
+                economySize == plane.economySize &&
+                premiumSize == plane.premiumSize &&
+                businessSize == plane.businessSize &&
+                firstClassSize == plane.firstClassSize &&
+                Objects.equals(idPlane, plane.idPlane) &&
+                Objects.equals(country, plane.country);
     }
 
     @Override

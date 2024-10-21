@@ -63,8 +63,14 @@ public class AirportService {
                     do {
                         CRUD = InputService.setInput(menuSrv.EntityMenu(), EntityOptions.values().length, Integer.class);
                         switch (EntityOptions.values()[CRUD]) {
-                            case CREATE -> planeSrv.add();
                             case SEE_ALL -> planeSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case CREATE -> planeSrv.add();
+                            case DELETE -> planeSrv.delete();
+                            case UPDATE -> planeSrv.update();
+                            case SEARCH ->
+                                    planeSrv.search().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case GET_ONE -> Utils.CONSOLE.info(planeSrv.getById().toString());
+
                         }
                     } while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
                 }

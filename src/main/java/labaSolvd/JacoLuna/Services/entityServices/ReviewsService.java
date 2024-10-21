@@ -16,12 +16,10 @@ public class ReviewsService implements IService<Review> {
 
     private final SourceOptions source;
     private Reviews reviews;
-    private Marshaller<Reviews, Review> marshaller;
     public ReviewsService(SourceOptions source) {
         this.source = source;
         if (source == SourceOptions.XML){
             reviews = new Reviews();
-            marshaller = new Marshaller<>();
         }
     }
     @Override
@@ -42,7 +40,7 @@ public class ReviewsService implements IService<Review> {
             newList.add(Review);
             reviews.setReviews(newList);
             try {
-                marshaller.MarshallList(reviews, Reviews.class, XmlPaths.REVIEWS);
+                Marshaller.MarshallList(reviews, Reviews.class, XmlPaths.REVIEWS);
             } catch (JAXBException e) {
                 Utils.CONSOLE_ERROR.error(e);
             }
@@ -65,7 +63,7 @@ public class ReviewsService implements IService<Review> {
 //            return reviewDAO.getList();
             return null;
         try {
-            return marshaller.UnMarshallList(Reviews.class, XmlPaths.REVIEWS);
+            return Marshaller.UnMarshallList(Reviews.class, XmlPaths.REVIEWS);
         } catch (JAXBException e) {
             Utils.CONSOLE_ERROR.error(e);
         }

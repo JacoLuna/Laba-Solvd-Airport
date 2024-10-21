@@ -27,7 +27,7 @@ public class PlaneDAO implements IDAOPlane {
     private static final String GET_PLANE_QUERY = "SELECT * FROM plane WHERE idPlane = ?";
     private static final String GET_ALL_PLANES_QUERY = "SELECT * FROM plane";
     private static final String UPDATE_PLANE_QUERY =
-            "UPDATE plane SET fuelCapacity = ?, tripulationSize = ?, economySize = ?, premiumSize = ?, buinessSize = ?, firstClassSize = ?, country = ? WHERE idPlane = ?";
+            "UPDATE plane SET fuelCapacity = ?, tripulationSize = ?, economySize = ?, premiumSize = ?, businessSize = ?, firstClassSize = ?, country = ? WHERE idPlane = ?";
     private static final String DEL_PLANE_QUERY = "DELETE FROM plane WHERE idPlane = ?";
 
     @Override
@@ -123,9 +123,10 @@ public class PlaneDAO implements IDAOPlane {
             ps.setInt(5, plane.getBusinessSize());
             ps.setInt(6, plane.getFirstClassSize());
             ps.setString(7, plane.getCountry());
+            ps.setString(8, plane.getIdPlane());
             if (ps.executeUpdate() == 0) throw new SQLException();
         } catch (SQLException e) {
-            throw new RuntimeException("Couldn't update Plane", e);
+            throw new RuntimeException("Couldn't update Plane " + e);
         } catch (Exception e) {
             Utils.CONSOLE_ERROR.error(e);
         }

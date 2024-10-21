@@ -15,21 +15,21 @@ import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class PlaneService implements IService<Plane> {
     private final PlaneDAO planeDAO;
     private final SourceOptions source;
     private Planes planes;
+    private List<Plane> planeList;
+
     public PlaneService(SourceOptions sourceOptions) {
         source = sourceOptions;
         if (source == SourceOptions.XML) {
             planes = new Planes();
         }
         this.planeDAO = new PlaneDAO();
+        planeList = getAll();
     }
 
     @Override
@@ -53,20 +53,17 @@ public class PlaneService implements IService<Plane> {
         String country = InputService.stringAns("Please enter the country");
         plane = new Plane(planeCode, fuelCapacity, tripulationSize, economySize, premiumSize, businessSize, firstClassSize, country);
 
-        List<Plane> newList = getAll();
-        newList.add(plane);
-        switch (source){
+        planeList.add(plane);
+        switch (source) {
             case XML -> {
-                planes.setPlanes(newList);
+                planes.setPlanes(planeList);
                 try {
                     Marshaller.MarshallList(planes, Planes.class, XmlPaths.PLANES);
                 } catch (JAXBException e) {
                     Utils.CONSOLE_ERROR.error(e);
                 }
             }
-            case JSON -> {
-                JsonParser.parse(newList, JsonPaths.PLANES.path);
-            }
+            case JSON -> JsonParser.parse(planeList, JsonPaths.PLANES);
             case DATA_BASE -> {
                 if (planeDAO.add(plane) != -1) {
                     Utils.CONSOLE.info("Plane added code:{}", planeCode);
@@ -91,10 +88,29 @@ public class PlaneService implements IService<Plane> {
 
     @Override
     public Plane getById() {
-        if (source == SourceOptions.DATA_BASE) {
-            return planeDAO.getById(selectPlaneId());
-        } else {
+        String id;
+        switch (source) {
+            case XML, JSON -> {
+                try {
+                    if (source == SourceOptions.XML)
+                        planeList = Marshaller.UnMarshallList(Planes.class, XmlPaths.PLANES);
+                    else
+                        planeList = JsonParser.unparseToList(Plane.class, JsonPaths.PLANES);
 
+                    id = selectPlaneId();
+                    if (planeList != null && !planeList.isEmpty()) {
+                        return planeList.stream()
+                                .filter(p -> p.getIdPlane().equals(id))
+                                .findFirst()
+                                .orElse(null);
+                    }
+                } catch (JAXBException e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                }
+            }
+            case DATA_BASE -> {
+                return planeDAO.getById(selectPlaneId());
+            }
         }
         return null;
     }
@@ -102,17 +118,42 @@ public class PlaneService implements IService<Plane> {
     @Override
     public boolean delete() {
         boolean result = false;
-        if (source == SourceOptions.DATA_BASE) {
-            result = planeDAO.delete(selectPlaneId());
-        }else {
-
+        String id;
+        switch (source) {
+            case XML, JSON -> {
+                try {
+                    if (source == SourceOptions.XML)
+                        planeList = Marshaller.UnMarshallList(Planes.class, XmlPaths.PLANES);
+                    else
+                        planeList = JsonParser.unparseToList(Plane.class, JsonPaths.PLANES);
+                    id = selectPlaneId();
+                    if (planeList != null && !planeList.isEmpty()) {
+                        planeList.remove(
+                                planeList.stream()
+                                        .filter(p -> p.getIdPlane().equals(id))
+                                        .findFirst()
+                                        .orElse(null)
+                        );
+                    }
+                    if (source == SourceOptions.XML) {
+                        this.planes.setPlanes(planeList);
+                        Marshaller.MarshallList(this.planes, Planes.class, XmlPaths.PLANES);
+                    } else
+                        JsonParser.parse(planeList, JsonPaths.PLANES);
+                } catch (JAXBException e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                }
+            }
+            case DATA_BASE -> {
+                result = planeDAO.delete(selectPlaneId());
+            }
         }
         return result;
     }
 
     @Override
     public List<Plane> getAll() {
-        switch (source){
+        switch (source) {
             case XML -> {
                 try {
                     return Marshaller.UnMarshallList(Planes.class, XmlPaths.PLANES);
@@ -121,12 +162,12 @@ public class PlaneService implements IService<Plane> {
                 }
             }
             case JSON -> {
-                return JsonParser.unparseToList(JsonPaths.PLANES.path, Plane.class);
+                return JsonParser.unparseToList(Plane.class, JsonPaths.PLANES);
             }
             case DATA_BASE -> {
                 return planeDAO.getList();
             }
-        };
+        }
         return null;
     }
 
@@ -138,15 +179,34 @@ public class PlaneService implements IService<Plane> {
     @Override
     public void update() {
         Plane plane = getById();
-
+        int index = planeList.indexOf(plane);
+        updatePlaneAttributes(plane);
+        planeList.set(index, plane);
+        switch (source) {
+            case XML -> {
+                planes.setPlanes(planeList);
+                try {
+                    Marshaller.MarshallList(planes, Planes.class, XmlPaths.PLANES);
+                } catch (JAXBException e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                }
+            }
+            case JSON -> JsonParser.parse(planeList, JsonPaths.PLANES);
+            case DATA_BASE -> {
+                try {
+                    planeDAO.update(plane);
+                } catch (Exception e) {
+                    Utils.CONSOLE.error("Error while updating plane: {}", e.getMessage());
+                }
+            }
+        }
     }
 
     private String selectPlaneId() {
         StringBuilder sb = new StringBuilder("Select the code of the plane");
-        List<Plane> planes = getAll();
         List<String> codeList = new ArrayList<>();
         String code;
-        for (Plane p : planes) {
+        for (Plane p : planeList) {
             codeList.add(p.getIdPlane());
             sb.append("\n").append(p.getIdPlane());
         }
@@ -166,7 +226,7 @@ public class PlaneService implements IService<Plane> {
         } while (ans != attributes.size());
     }
 
-    private int selectAtt(List<Field> attributes){
+    private int selectAtt(List<Field> attributes) {
         int ans;
         StringBuilder sb = new StringBuilder("Select an attribute\n");
         for (int i = 1; i < attributes.size(); i++) {
@@ -180,13 +240,14 @@ public class PlaneService implements IService<Plane> {
     private void updateAttribute(Plane plane, Field field) {
         field.setAccessible(true);
         switch (field.getName()) {
-            case "fuelCapacity"-> plane.setFuelCapacity(InputService.setInput("Fuel capacity: ", Integer.class));
-            case "tripulationSize"-> plane.setTripulationSize(InputService.setInput("Tripulation size: ", Integer.class));
-            case "economySize"-> plane.setEconomySize(InputService.setInput("economy size: ", Integer.class));
-            case "premiumSize"-> plane.setPremiumSize(InputService.setInput("premium size: ", Integer.class));
-            case "businessSize"-> plane.setBusinessSize(InputService.setInput("business size: ", Integer.class));
-            case "firstClassSize"-> plane.setFirstClassSize(InputService.setInput("firstClass size: ", Integer.class));
-            case "country"-> plane.setCountry(InputService.stringAns("country: "));
+            case "fuelCapacity" -> plane.setFuelCapacity(InputService.setInput("Fuel capacity: ", Integer.class));
+            case "tripulationSize" ->
+                    plane.setTripulationSize(InputService.setInput("Tripulation size: ", Integer.class));
+            case "economySize" -> plane.setEconomySize(InputService.setInput("economy size: ", Integer.class));
+            case "premiumSize" -> plane.setPremiumSize(InputService.setInput("premium size: ", Integer.class));
+            case "businessSize" -> plane.setBusinessSize(InputService.setInput("business size: ", Integer.class));
+            case "firstClassSize" -> plane.setFirstClassSize(InputService.setInput("firstClass size: ", Integer.class));
+            case "country" -> plane.setCountry(InputService.stringAns("country: "));
         }
     }
 }

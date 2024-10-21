@@ -2,7 +2,7 @@
 <Planes>
     <Plane idPlane="C123">
         <fuelCapacity>150000</fuelCapacity>
-        <tripulationSize>4</tripulationSize>
+        <tripulationSize>5</tripulationSize>
         <economySize>45</economySize>
         <premiumSize>5</premiumSize>
         <businessSize>0</businessSize>
