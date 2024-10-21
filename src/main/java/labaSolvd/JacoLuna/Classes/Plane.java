@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import jakarta.xml.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @XmlRootElement(name = "Plane")
@@ -29,6 +30,10 @@ public class Plane {
     private int firstClassSize;
     @XmlElement(name = "country")
     private String country;
+    private LocalDate departureDate;
+    private LocalDate arrivalDate;
+    private String departureHour;
+    private String arrivalHour;
 
     public Plane() {
     }

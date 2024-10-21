@@ -5,10 +5,12 @@ import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.Plane;
 import labaSolvd.JacoLuna.Classes.xmlLists.Planes;
 import labaSolvd.JacoLuna.DAO.PlaneDAO;
+import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
 import labaSolvd.JacoLuna.Enums.XmlPaths;
 import labaSolvd.JacoLuna.Interfaces.IService;
 import labaSolvd.JacoLuna.Parsers.JAX.Marshaller;
+import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
 
@@ -22,13 +24,10 @@ public class PlaneService implements IService<Plane> {
     private final PlaneDAO planeDAO;
     private final SourceOptions source;
     private Planes planes;
-    private Marshaller<Planes, Plane> marshaller;
-
     public PlaneService(SourceOptions sourceOptions) {
         source = sourceOptions;
         if (source == SourceOptions.XML) {
             planes = new Planes();
-            marshaller = new Marshaller<>();
         }
         this.planeDAO = new PlaneDAO();
     }
@@ -53,18 +52,25 @@ public class PlaneService implements IService<Plane> {
         }
         String country = InputService.stringAns("Please enter the country");
         plane = new Plane(planeCode, fuelCapacity, tripulationSize, economySize, premiumSize, businessSize, firstClassSize, country);
-        if (source == SourceOptions.DATA_BASE) {
-            if (planeDAO.add(plane) != -1) {
-                Utils.CONSOLE.info("Plane added code:{}", planeCode);
+
+        List<Plane> newList = getAll();
+        newList.add(plane);
+        switch (source){
+            case XML -> {
+                planes.setPlanes(newList);
+                try {
+                    Marshaller.MarshallList(planes, Planes.class, XmlPaths.PLANES);
+                } catch (JAXBException e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                }
             }
-        } else {
-            List<Plane> newList = getAll();
-            newList.add(plane);
-            planes.setPlanes(newList);
-            try {
-                marshaller.MarshallList(planes, Planes.class, XmlPaths.PLANES);
-            } catch (JAXBException e) {
-                Utils.CONSOLE_ERROR.error(e);
+            case JSON -> {
+                JsonParser.parse(newList, JsonPaths.PLANES.path);
+            }
+            case DATA_BASE -> {
+                if (planeDAO.add(plane) != -1) {
+                    Utils.CONSOLE.info("Plane added code:{}", planeCode);
+                }
             }
         }
     }
@@ -106,13 +112,21 @@ public class PlaneService implements IService<Plane> {
 
     @Override
     public List<Plane> getAll() {
-        if (source == SourceOptions.DATA_BASE)
-            return planeDAO.getList();
-        try {
-            return marshaller.UnMarshallList(Planes.class, XmlPaths.PLANES);
-        } catch (JAXBException e) {
-            Utils.CONSOLE_ERROR.error(e);
-        }
+        switch (source){
+            case XML -> {
+                try {
+                    return Marshaller.UnMarshallList(Planes.class, XmlPaths.PLANES);
+                } catch (JAXBException e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                }
+            }
+            case JSON -> {
+                return JsonParser.unparseToList(JsonPaths.PLANES.path, Plane.class);
+            }
+            case DATA_BASE -> {
+                return planeDAO.getList();
+            }
+        };
         return null;
     }
 
