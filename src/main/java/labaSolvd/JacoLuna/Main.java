@@ -14,6 +14,7 @@ public class Main {
         int ans;
         boolean isValid;
         String xml, xmlSchema;
+
         do {
             ans = InputService.setInput("Menu\n1 - Start program\n2 - Check XML Schema\n3 - Exit", Arrays.asList(1,2,3), Integer.class);
             if(ans == 1){
