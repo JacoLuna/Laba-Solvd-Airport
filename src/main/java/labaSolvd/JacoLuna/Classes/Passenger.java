@@ -1,11 +1,24 @@
 package labaSolvd.JacoLuna.Classes;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import jakarta.xml.bind.annotation.*;
+
 import java.util.Objects;
 
+@XmlRootElement(name = "Passenger")
+@XmlAccessorType(XmlAccessType.FIELD)
+@JsonRootName(value = "Passenger")
+@JsonPropertyOrder({"idPassenger", "VIP", "flightPoints", "hasSpecialNeeds"})
 public class Passenger extends People{
+    @XmlAttribute(name = "idPassenger")
     private long idPassenger;
+    @XmlElement(name = "VIP")
     private boolean VIP;
+    @XmlElement(name = "flightPoints")
     private int flightPoints;
+    @XmlElement(name = "hasSpecialNeeds")
     private boolean hasSpecialNeeds;
 
     private void initialize(Boolean VIP, int flightPoints, Boolean hasSpecialNeeds) {
@@ -30,18 +43,22 @@ public class Passenger extends People{
         initialize(VIP, flightPoints, hasSpecialNeeds);
     }
 
+    @JsonGetter("idPassenger")
     public long getIdPassenger() {
         return idPassenger;
     }
 
+    @JsonGetter("VIP")
     public Boolean isVIP() {
         return VIP;
     }
 
+    @JsonGetter("flightPoints")
     public int getFlightPoints() {
         return flightPoints;
     }
 
+    @JsonGetter("hasSpecialNeeds")
     public Boolean hasSpecialNeeds() {
         return hasSpecialNeeds;
     }

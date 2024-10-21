@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import jakarta.xml.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 @XmlRootElement(name = "Plane")
@@ -58,14 +59,17 @@ public class Plane {
     public int getTripulationSize() {
         return tripulationSize;
     }
+
     @JsonGetter("economySize")
     public int getEconomySize() {
         return economySize;
     }
+
     @JsonGetter("premiumSize")
     public int getPremiumSize() {
         return premiumSize;
     }
+
     @JsonGetter("businessSize")
     public int getBusinessSize() {
         return businessSize;
@@ -118,7 +122,14 @@ public class Plane {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Plane plane = (Plane) o;
-        return fuelCapacity == plane.fuelCapacity && tripulationSize == plane.tripulationSize && economySize == plane.economySize && premiumSize == plane.premiumSize && businessSize == plane.businessSize && firstClassSize == plane.firstClassSize && Objects.equals(idPlane, plane.idPlane) && Objects.equals(country, plane.country);
+        return fuelCapacity == plane.fuelCapacity &&
+                tripulationSize == plane.tripulationSize &&
+                economySize == plane.economySize &&
+                premiumSize == plane.premiumSize &&
+                businessSize == plane.businessSize &&
+                firstClassSize == plane.firstClassSize &&
+                Objects.equals(idPlane, plane.idPlane) &&
+                Objects.equals(country, plane.country);
     }
 
     @Override

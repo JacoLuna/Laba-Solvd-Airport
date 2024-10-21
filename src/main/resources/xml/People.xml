@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Persons>
+    <People xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="passenger" idPassenger="1" idPeople="-1">
+        <name>1</name>
+        <surname>1</surname>
+        <Email>1</Email>
+        <age>2</age>
+        <VIP>false</VIP>
+        <flightPoints>0</flightPoints>
+        <hasSpecialNeeds>false</hasSpecialNeeds>
+    </People>
+    <People xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="passenger" idPassenger="1" idPeople="-1">
+        <name>1</name>
+        <surname>1</surname>
+        <Email>1</Email>
+        <age>2</age>
+        <VIP>false</VIP>
+        <flightPoints>0</flightPoints>
+        <hasSpecialNeeds>false</hasSpecialNeeds>
+    </People>
+</Persons>

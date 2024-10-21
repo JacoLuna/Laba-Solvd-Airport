@@ -27,12 +27,12 @@ public class AirportService {
 
     public void startProgram(SourceOptions source) {
         int ans, CRUD;
-        passengerSrv = new PassengerService();
+        passengerSrv = new PassengerService(source);
         planeSrv = new PlaneService(source);
         reviewsSrv = new ReviewsService(source);
 
-        List<Plane> myObjects = JsonParser.unparseToList("src\\main\\resources\\json\\Planes.json", Plane.class);
-        myObjects.forEach(p -> System.out.println(p.toString()));
+//        List<Plane> myObjects = JsonParser.unparseToList("src\\main\\resources\\json\\Planes.json", Plane.class);
+//        myObjects.forEach(p -> System.out.println(p.toString()));
 
         do {
             ans = InputService.setInput(MenuOptions.printMenu(), MenuOptions.values().length, Integer.class);
@@ -63,8 +63,14 @@ public class AirportService {
                     do {
                         CRUD = InputService.setInput(menuSrv.EntityMenu(), EntityOptions.values().length, Integer.class);
                         switch (EntityOptions.values()[CRUD]) {
-                            case CREATE -> planeSrv.add();
                             case SEE_ALL -> planeSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case CREATE -> planeSrv.add();
+                            case DELETE -> planeSrv.delete();
+                            case UPDATE -> planeSrv.update();
+                            case SEARCH ->
+                                    planeSrv.search().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case GET_ONE -> Utils.CONSOLE.info(planeSrv.getById().toString());
+
                         }
                     } while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
                 }

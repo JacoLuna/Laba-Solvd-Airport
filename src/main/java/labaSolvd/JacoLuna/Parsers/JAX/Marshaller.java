@@ -14,14 +14,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
-public class Marshaller<T, K> {
-    public void MarshallList(T list, Class<T> type, XmlPaths xmlPath) throws JAXBException {
+public class Marshaller {
+    public static <T> void MarshallList(T list, Class<T> type, XmlPaths xmlPath) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(type);
         jakarta.xml.bind.Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
         jaxbMarshaller.setProperty(jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true);
         jaxbMarshaller.marshal(list, new File(xmlPath.path));
     }
-    public List<K> UnMarshallList(Class<T> type, XmlPaths xmlPath) throws JAXBException {
+    public static <T,K> List<K> UnMarshallList(Class<T> type, XmlPaths xmlPath) throws JAXBException {
         JAXBContext jaxbContext = JAXBContext.newInstance(type);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
         T listClass = (T) jaxbUnmarshaller.unmarshal(new File(xmlPath.path));
@@ -34,7 +34,7 @@ public class Marshaller<T, K> {
         }
         return List.of();
     }
-    private String getXmlRootElementName(Class<T> clazz) {
+    private static <T> String getXmlRootElementName(Class<T> clazz) {
         if (clazz.isAnnotationPresent(XmlRootElement.class)) {
             XmlRootElement xmlRootElement = clazz.getAnnotation(XmlRootElement.class);
             if (!xmlRootElement.name().equals("##default")) {

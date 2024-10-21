@@ -1,10 +1,21 @@
 package labaSolvd.JacoLuna.Classes;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import jakarta.xml.bind.annotation.*;
+
 import java.util.Objects;
 
+@XmlRootElement(name = "CrewMember")
+@XmlAccessorType(XmlAccessType.FIELD)
+@JsonRootName(value = "CrewMember")
+@JsonPropertyOrder({"idPassenger", "role", "flightHours"})
 public class CrewMember extends People{
+    @XmlAttribute(name = "idCrewMember")
     private long idCrewMember;
+    @XmlElement(name = "role")
     private String role;
+    @XmlElement(name = "flightHours")
     private int flightHours;
 
     public CrewMember() {}
