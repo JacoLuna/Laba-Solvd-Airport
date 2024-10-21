@@ -1,7 +1,6 @@
 package labaSolvd.JacoLuna.Services.entityServices;
 
 import jakarta.xml.bind.JAXBException;
-import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.Plane;
 import labaSolvd.JacoLuna.Classes.xmlLists.Planes;
 import labaSolvd.JacoLuna.DAO.PlaneDAO;

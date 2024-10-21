@@ -2,7 +2,8 @@ package labaSolvd.JacoLuna.Enums;
 
 public enum XmlPaths {
     PLANES("Planes.xml"),
-    REVIEWS("Reviews.xml");
+    REVIEWS("Reviews.xml"),
+    PEOPLE("People.xml");
 
     public String path = "src\\main\\resources\\xml\\";
 

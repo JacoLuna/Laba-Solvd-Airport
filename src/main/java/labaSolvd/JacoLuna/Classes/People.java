@@ -1,12 +1,27 @@
 package labaSolvd.JacoLuna.Classes;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import jakarta.xml.bind.annotation.*;
+
 import java.util.Objects;
 
+@XmlRootElement(name = "Person")
+@XmlSeeAlso({Passenger.class, CrewMember.class})
+@XmlAccessorType(XmlAccessType.FIELD)
+@JsonRootName(value = "Person")
+@JsonPropertyOrder({"idPeople", "name", "surname", "economySize", "Email", "age"})
 public abstract class People {
+    @XmlAttribute(name = "idPeople")
     protected long idPeople;
+    @XmlElement(name = "name")
     protected String name;
+    @XmlElement(name = "surname")
     protected String surname;
+    @XmlElement(name = "Email")
     protected String Email;
+    @XmlElement(name = "age")
     protected int age;
 
     public People() {}
@@ -21,18 +36,23 @@ public abstract class People {
         this.age = age;
     }
 
+    @JsonGetter("idPeople")
     public long getIdPeople() {
         return idPeople;
     }
+    @JsonGetter("name")
     public String getName() {
         return name;
     }
+    @JsonGetter("surname")
     public String getSurname() {
         return surname;
     }
+    @JsonGetter("Email")
     public String getEmail() {
         return Email;
     }
+    @JsonGetter("age")
     public int getAge() {
         return age;
     }

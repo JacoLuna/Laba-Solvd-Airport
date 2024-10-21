@@ -27,7 +27,7 @@ public class AirportService {
 
     public void startProgram(SourceOptions source) {
         int ans, CRUD;
-        passengerSrv = new PassengerService();
+        passengerSrv = new PassengerService(source);
         planeSrv = new PlaneService(source);
         reviewsSrv = new ReviewsService(source);
 
