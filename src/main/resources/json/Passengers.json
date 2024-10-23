@@ -1,0 +1,24 @@
+[
+  {
+    "idPassenger": 1,
+    "VIP": false,
+    "flightPoints": 0,
+    "hasSpecialNeeds": false,
+    "idPeople": 1,
+    "name": "Daniel",
+    "surname": "Luna",
+    "age": 56,
+    "Email": "daniel@gmail.com"
+  },
+  {
+    "idPassenger": 2,
+    "VIP": false,
+    "flightPoints": 1500,
+    "hasSpecialNeeds": false,
+    "idPeople": 2,
+    "name": "Juan",
+    "surname": "Joaquim",
+    "age": 40,
+    "Email": "joaquim@gmail.com"
+  }
+]

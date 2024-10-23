@@ -31,9 +31,6 @@ public class AirportService {
         planeSrv = new PlaneService(source);
         reviewsSrv = new ReviewsService(source);
 
-//        List<Plane> myObjects = JsonParser.unparseToList("src\\main\\resources\\json\\Planes.json", Plane.class);
-//        myObjects.forEach(p -> System.out.println(p.toString()));
-
         do {
             ans = InputService.setInput(MenuOptions.printMenu(), MenuOptions.values().length, Integer.class);
             switch (MenuOptions.values()[ans]) {

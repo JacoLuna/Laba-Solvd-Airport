@@ -4,6 +4,7 @@ import jakarta.xml.bind.JAXBException;
 import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.People;
 import labaSolvd.JacoLuna.Classes.xmlLists.Persons;
+import labaSolvd.JacoLuna.Classes.xmlLists.Planes;
 import labaSolvd.JacoLuna.DAO.PassengerDAO;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
@@ -14,6 +15,7 @@ import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Parsers.SAX.PeopleSaxParser;
 import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,6 +24,8 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -34,13 +38,15 @@ public class PassengerService implements IService<Passenger> {
     private final List<Passenger> passengersList;
 
     public PassengerService(SourceOptions source) {
+        this.source = source;
         this.passengerDAO = new PassengerDAO();
         this.peopleService = new PeopleService(source);
-        this.source = source;
+        passengersList = getAll();
+        System.out.println(passengersList.size());
         if (this.source == SourceOptions.XML) {
             persons = new Persons();
+            persons.getPersons().addAll(passengersList);
         }
-        passengersList = getAll();
     }
 
     public void add() {
@@ -53,109 +59,146 @@ public class PassengerService implements IService<Passenger> {
 
         long idPeople = peopleService.add(name, surname, email, age);
         Passenger passenger = new Passenger(idPeople, name, surname, email, age, VIP, 0, hasSpecialNeeds);
-        addPassenger(passenger);
-        switch (source) {
-            case XML -> addPassengerWithXML(passenger);
-            case JSON -> JsonParser.parse(passengersList, JsonPaths.PEOPLE);
-            case DATA_BASE -> {
-                long id = passengerDAO.add(passenger);
-                if (id != -1) {
-                    Utils.CONSOLE.info("Passenger {} created id:{}", name, id);
-                }
+        if (source == SourceOptions.DATA_BASE) {
+            long id = passengerDAO.add(passenger);
+            if (id != -1) {
+                Utils.CONSOLE.info("Passenger {} created id:{}", name, id);
             }
+        } else {
+            addPassengerWithManualId(passenger);
         }
     }
 
-    private void addPassengerWithXML(Passenger passenger) {
-        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-        List<Passenger> passengers = new ArrayList<>();
+    private void addPassengerWithManualId(Passenger passenger) {
         long id = 1;
-        try {
-            SAXParser saxParser = saxParserFactory.newSAXParser();
-            PeopleSaxParser handler = new PeopleSaxParser();
-            saxParser.parse(new File(XmlPaths.PEOPLE.path), handler);
-            List<People> empList = handler.getEmpList();
-            if (empList != null){
-                if (!empList.isEmpty()){
-                    empList.forEach(p -> {
-                        if (p.getClass().equals(Passenger.class)) {
-                            passengers.add((Passenger) p);
-                        }
-                    });
-
-                    id = Collections.max(passengers, Comparator.comparing(Passenger::getIdPassenger)).getIdPassenger() + 1;
-                }
-            }
-            passenger.setIdPassenger(id);
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
+        if (!passengersList.isEmpty()) {
+            id = Collections.max(getAll(), Comparator.comparing(Passenger::getIdPassenger)).getIdPassenger() + 1;
         }
+        passenger.setIdPassenger(id);
         addPassenger(passenger);
-        try {
-            Marshaller.MarshallList(persons, Persons.class, XmlPaths.PEOPLE);
-        } catch (JAXBException e) {
-            Utils.CONSOLE_ERROR.error(e);
-        }
+        overwriteFile();
     }
 
     private void addPassenger(Passenger passenger) {
-        persons.getPersons().add(passenger);
+        if (source == SourceOptions.XML)
+            persons.getPersons().add(passenger);
         passengersList.add(passenger);
     }
 
     private void delPassenger(Passenger passenger) {
-        persons.getPersons().remove(passenger);
+        if (source == SourceOptions.XML)
+            persons.getPersons().remove(passenger);
         passengersList.remove(passenger);
     }
 
     private void updatePassenger(Passenger passenger) {
-        int index = persons.getPersons().indexOf(passenger);
-        persons.getPersons().set(index, passenger);
+        int index = 0;
+        if (source == SourceOptions.XML) {
+            index = persons.getPersons().indexOf(passenger);
+            persons.getPersons().set(index, passenger);
+        }
         index = passengersList.indexOf(passenger);
         passengersList.set(index, passenger);
     }
 
+    private void overwriteFile() {
+        try {
+            if (source == SourceOptions.XML)
+                Marshaller.MarshallList(persons, Persons.class, XmlPaths.PEOPLE);
+            else
+                JsonParser.parse(passengersList, JsonPaths.PASSENGERS);
+        } catch (JAXBException e) {
+            Utils.CONSOLE.error("Failed to add passenger {}", e.getMessage());
+        }
+
+    }
+
     public Passenger getById() {
-        return passengerDAO.getById(selectPassengerId());
+        long id = selectPassengerId();
+        if (source == SourceOptions.DATA_BASE) {
+            return passengerDAO.getById(id);
+        } else {
+            return getAll().stream()
+                    .filter(p -> p.getIdPassenger() == id)
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 
     public boolean delete() {
         boolean result = false;
-        try {
-            passengerDAO.delete(selectPassengerId());
-        } catch (Exception e) {
-            Utils.CONSOLE.error("Error while deleting passenger");
+        if (source == SourceOptions.DATA_BASE) {
+            try {
+                passengerDAO.delete(selectPassengerId());
+            } catch (Exception e) {
+                Utils.CONSOLE.error("Error while deleting passenger");
+            }
+        } else {
+            Passenger passenger = getById();
+            delPassenger(passenger);
+            overwriteFile();
         }
         return result;
     }
 
     public List<Passenger> getAll() {
-        return passengerDAO.getList();
+        List<Passenger> passengers = new ArrayList<>();
+        switch (source) {
+            case XML -> {
+                SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+                try {
+                    SAXParser saxParser = saxParserFactory.newSAXParser();
+                    PeopleSaxParser handler = new PeopleSaxParser();
+                    saxParser.parse(new File(XmlPaths.PEOPLE.path), handler);
+                    List<People> empList = handler.getEmpList();
+                    if (empList != null) {
+                        for (People p : empList) {
+                            if (p.getClass().equals(Passenger.class)) {
+                                passengers.add((Passenger) p);
+                            }
+                        }
+                    }
+                } catch (ParserConfigurationException | SAXException | IOException e) {
+                    Utils.CONSOLE.error("Failed to bring passengers {}", e.getMessage());
+                }
+            }
+            case JSON -> passengers = JsonParser.unparseToList(Passenger.class, JsonPaths.PASSENGERS);
+            case DATA_BASE -> passengers = passengerDAO.getList();
+        }
+        if (passengers == null) {
+            passengers = new ArrayList<>();
+        }
+        return passengers;
     }
 
     public void update() {
         Passenger passenger = getById();
         updatePassengerAttributes(passenger);
-        try {
-            passengerDAO.update(passenger);
-        } catch (Exception e) {
-            Utils.CONSOLE.error("Error while updating passenger: {}", e.getMessage());
+
+        if (source == SourceOptions.DATA_BASE) {
+            try {
+                passengerDAO.update(passenger);
+            } catch (Exception e) {
+                Utils.CONSOLE.error("Error while updating passenger: {}", e.getMessage());
+            }
+        } else {
+            updatePassenger(passenger);
+            overwriteFile();
         }
     }
 
     public List<Passenger> search() {
         List<Field> attributes = getPassengerAttributes();
         List<Passenger> passengers = new ArrayList<>();
+        Method method;
         try {
-            Object value;
             int attIndex = selectAtt(attributes);
+            Object value;
+            Class<?> fieldType = attributes.get(attIndex).getType();
 
             if (attributes.get(attIndex).getType().equals(String.class)) {
                 value = InputService.stringAns("Please enter the search value");
-                passengers = passengerDAO.search(attributes.get(attIndex).getName(), (String) value);
             } else {
-
-                Class<?> fieldType = attributes.get(attIndex).getType();
                 Utils.CONSOLE.info(fieldType.getName());
                 value = switch (fieldType.getName()) {
                     case "int" -> InputService.setInput("Please enter the search value", Integer.class);
@@ -164,9 +207,29 @@ public class PassengerService implements IService<Passenger> {
                     case "boolean" -> InputService.booleanAns("is the value true?");
                     default -> null;
                 };
-                if (value != null)
-                    passengers = passengerDAO.search(attributes.get(attIndex).getName(), value);
             }
+
+            if (source == SourceOptions.DATA_BASE) {
+                passengers = passengerDAO.search(attributes.get(attIndex).getName(), value);
+            } else {
+                try {
+                    method = People.class.getMethod((fieldType.getName().equals(("boolean")) ? "is" : "get") + StringUtils.capitalize(attributes.get(attIndex).getName()));
+                } catch (NoSuchMethodException e) {
+                    method = Passenger.class.getMethod((fieldType.getName().equals(("boolean")) ? "is" : "get") + StringUtils.capitalize(attributes.get(attIndex).getName()));
+                }
+                for (Passenger p : getAll()) {
+                    if (fieldType.getName().equals("String")) {
+                        if (StringUtils.contains((String) method.invoke(p), value.toString())) {
+                            passengers.add(p);
+                        }
+                    }else {
+                            if (method.invoke(p).equals(value)) {
+                                passengers.add(p);
+                            }
+                    }
+                }
+            }
+
         } catch (Exception e) {
             Utils.CONSOLE.error("Error while searching passengers: {}", e.getMessage());
         }

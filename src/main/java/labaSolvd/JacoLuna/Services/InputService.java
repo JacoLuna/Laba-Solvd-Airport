@@ -47,7 +47,7 @@ public class InputService {
         T answer = null;
         boolean isValid = false;
         do {
-            CONSOLE.info("{}[{}-{}]:",prompt, minValue, maxValue);
+            CONSOLE.info("{}",prompt);
             try {
                 answer = readAnswer(type);
                 if (answer.doubleValue() < minValue.doubleValue() || answer.doubleValue() > maxValue.doubleValue()) {
@@ -115,7 +115,7 @@ public class InputService {
         return InputService.setInput(prompt + "\n0 - No\n1 - Yes\n", Arrays.asList(0, 1), Integer.class) == 1;
     }
     public static String stringAns(String prompt){
-        Utils.CONSOLE.info("{}:",prompt);
+        Utils.CONSOLE.info("{}",prompt);
         return keyboard.next();
     }
     public static String stringAns(String prompt, String pattern){
@@ -123,7 +123,7 @@ public class InputService {
         Pattern p = Pattern.compile(pattern);
         Matcher m;
         do {
-            Utils.CONSOLE.info("{}:",prompt);
+            Utils.CONSOLE.info("{}",prompt);
             ans = keyboard.next();
             m = p.matcher(StringUtils.remove(ans,"-"));
             if (!m.matches()){

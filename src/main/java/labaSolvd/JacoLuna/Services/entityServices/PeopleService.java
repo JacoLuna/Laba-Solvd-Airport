@@ -1,11 +1,15 @@
 package labaSolvd.JacoLuna.Services.entityServices;
 
+import labaSolvd.JacoLuna.Classes.CrewMember;
+import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.People;
 import labaSolvd.JacoLuna.DAO.PeopleDAO;
+import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
 import labaSolvd.JacoLuna.Enums.XmlPaths;
 import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Parsers.SAX.PeopleSaxParser;
+import labaSolvd.JacoLuna.Utils;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,11 +51,26 @@ public class PeopleService {
                         id = 1;
                     }
                 } catch (ParserConfigurationException | SAXException | IOException e) {
-                    e.printStackTrace();
+                    Utils.CONSOLE.error("Failed to add passenger {}", e.getMessage());
                 }
             }
             case JSON ->{
+                long idPeople;
+                List<Passenger> passengers = JsonParser.unparseToList(Passenger.class, JsonPaths.PASSENGERS);
+                List<CrewMember> crewMembers = JsonParser.unparseToList(CrewMember.class, JsonPaths.CREW_MEMBERS);
+                if (passengers != null && crewMembers != null){
+                    id = 1;
+                }else {
+                    long maxCrewId = (crewMembers != null && !crewMembers.isEmpty())
+                            ? Collections.max(crewMembers, Comparator.comparing(People::getIdPeople)).getIdPeople()
+                            : Long.MIN_VALUE;
 
+                    long maxPassengerId = (passengers != null && !passengers.isEmpty())
+                            ? Collections.max(passengers, Comparator.comparing(People::getIdPeople)).getIdPeople()
+                            : Long.MIN_VALUE;
+
+                    id = Math.max(maxCrewId, maxPassengerId)+1;
+                }
             }
         }
         return id;
