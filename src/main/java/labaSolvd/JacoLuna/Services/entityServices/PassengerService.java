@@ -3,6 +3,7 @@ package labaSolvd.JacoLuna.Services.entityServices;
 import jakarta.xml.bind.JAXBException;
 import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.People;
+import labaSolvd.JacoLuna.Classes.Plane;
 import labaSolvd.JacoLuna.Classes.xmlLists.Persons;
 import labaSolvd.JacoLuna.DAO.PassengerDAO;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
@@ -68,34 +69,42 @@ public class PassengerService implements IService<Passenger> {
 
     private void addPassengerWithXML(Passenger passenger) {
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+        List<People> people = new ArrayList<>();
         List<Passenger> passengers = new ArrayList<>();
         long id = 1;
-        try {
-            SAXParser saxParser = saxParserFactory.newSAXParser();
-            PeopleSaxParser handler = new PeopleSaxParser();
-            saxParser.parse(new File(XmlPaths.PEOPLE.path), handler);
-            List<People> empList = handler.getEmpList();
-            if (empList != null){
-                if (!empList.isEmpty()){
-                    empList.forEach(p -> {
-                        if (p.getClass().equals(Passenger.class)) {
-                            passengers.add((Passenger) p);
-                        }
-                    });
 
-                    id = Collections.max(passengers, Comparator.comparing(Passenger::getIdPassenger)).getIdPassenger() + 1;
-                }
+        people = saxParser();
+        if (people != null) {
+            if (!people.isEmpty()) {
+                people.forEach(p -> {
+                    if (p.getClass().equals(Passenger.class)) {
+                        passengers.add((Passenger) p);
+                    }
+                });
+                id = Collections.max(passengers, Comparator.comparing(Passenger::getIdPassenger)).getIdPassenger() + 1;
             }
-            passenger.setIdPassenger(id);
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            e.printStackTrace();
         }
+        passenger.setIdPassenger(id);
         addPassenger(passenger);
         try {
             Marshaller.MarshallList(persons, Persons.class, XmlPaths.PEOPLE);
         } catch (JAXBException e) {
             Utils.CONSOLE_ERROR.error(e);
         }
+    }
+
+    private List<People> saxParser() {
+        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+        List<People> people = null;
+        try {
+            SAXParser saxParser = saxParserFactory.newSAXParser();
+            PeopleSaxParser handler = new PeopleSaxParser();
+            saxParser.parse(new File(XmlPaths.PEOPLE.path), handler);
+            people = handler.getEmpList();
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+        }
+        return people;
     }
 
     private void addPassenger(Passenger passenger) {
@@ -130,7 +139,12 @@ public class PassengerService implements IService<Passenger> {
     }
 
     public List<Passenger> getAll() {
-        return passengerDAO.getList();
+        List<Passenger> passengers;
+        switch (source) {
+            case JSON -> passengers = JsonParser.unparseToList(Passenger.class, JsonPaths.PEOPLE);
+            case DATA_BASE -> passengers = passengerDAO.getList();
+        }
+        return null;
     }
 
     public void update() {
@@ -164,8 +178,7 @@ public class PassengerService implements IService<Passenger> {
                     case "boolean" -> InputService.booleanAns("is the value true?");
                     default -> null;
                 };
-                if (value != null)
-                    passengers = passengerDAO.search(attributes.get(attIndex).getName(), value);
+                passengers = passengerDAO.search(attributes.get(attIndex).getName(), value);
             }
         } catch (Exception e) {
             Utils.CONSOLE.error("Error while searching passengers: {}", e.getMessage());
