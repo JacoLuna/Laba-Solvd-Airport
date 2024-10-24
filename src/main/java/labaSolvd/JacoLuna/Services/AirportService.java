@@ -87,9 +87,12 @@ public class AirportService {
                     do {
                         CRUD = InputService.setInput(menuSrv.EntityMenu(), EntityOptions.values().length, Integer.class);
                         switch (EntityOptions.values()[CRUD]) {
-                            case CREATE -> reviewsSrv.add();
                             case SEE_ALL -> reviewsSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
-                            case GET_ONE -> Utils.CONSOLE.info(planeSrv.getById().toString());
+                            case CREATE -> reviewsSrv.add();
+                            case DELETE -> reviewsSrv.delete();
+                            case UPDATE -> reviewsSrv.update();
+                            case SEARCH -> reviewsSrv.search().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case GET_ONE -> Utils.CONSOLE.info(reviewsSrv.getById().toString());
                         }
                     } while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
                 }

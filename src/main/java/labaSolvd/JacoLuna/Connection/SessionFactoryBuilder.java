@@ -1,6 +1,7 @@
 package labaSolvd.JacoLuna.Connection;
 
 import labaSolvd.JacoLuna.myBatysDAO.PlaneMapper;
+import labaSolvd.JacoLuna.myBatysDAO.ReviewMapper;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.io.Resources;
@@ -42,6 +43,7 @@ public class SessionFactoryBuilder {
         Environment environment = new Environment("Development", new JdbcTransactionFactory(), dataSource);
         Configuration configuration = new Configuration(environment);
         configuration.addMapper(PlaneMapper.class);
+        configuration.addMapper(ReviewMapper.class);
 
         sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
         return sqlSessionFactory;
