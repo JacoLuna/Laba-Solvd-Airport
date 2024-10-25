@@ -121,6 +121,7 @@ public class ReviewsService implements IService<Review> {
                         Marshaller.MarshallList(this.reviews, Reviews.class, XmlPaths.REVIEWS);
                     } else
                         JsonParser.parse(reviewList, JsonPaths.REVIEWS);
+                    result = true;
                 } catch (JAXBException e) {
                     Utils.CONSOLE_ERROR.error(e);
                 }
@@ -170,19 +171,20 @@ public class ReviewsService implements IService<Review> {
         try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
             List<Field> attributes = Arrays.stream(Review.class.getDeclaredFields()).toList();
             int attIndex = selectAtt(attributes);
+            Field attribute = attributes.get(attIndex);
             Object value;
 
-            if (attributes.get(attIndex).getType().equals(String.class)) {
+            if (attribute.equals(String.class)) {
                 value = InputService.stringAns("Please enter the search value");
-                searchList = session.getMapper(ReviewMapper.class).searchByString(attributes.get(attIndex).getName(), (String) value);
+                searchList = session.getMapper(ReviewMapper.class).searchByString(attribute.getName(), (String) value);
             } else {
-                Class<?> fieldType = attributes.get(attIndex).getType();
+                Class<?> fieldType = attribute.getType();
                 Utils.CONSOLE.info(fieldType.getName());
                 String prompt = "Please enter the search value";
                 value = InputService.setInput(prompt, Integer.class);
 
                 if (value != null) {
-                    searchList = session.getMapper(ReviewMapper.class).searchByNumber(attributes.get(attIndex).getName(), (Number) value);
+                    searchList = session.getMapper(ReviewMapper.class).searchByNumber(attribute.getName(), (Number) value);
                 }
             }
         } catch (Exception e) {

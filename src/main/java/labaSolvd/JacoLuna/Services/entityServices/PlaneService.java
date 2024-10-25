@@ -65,19 +65,18 @@ public class PlaneService implements IService<Plane> {
     }
 
     private Plane inputData() {
-        Plane plane;
         String planeCode = enterPlaneCode();
         int fuelCapacity = InputService.setInput("Fuel capacity", MIN_FUEL_CAPACITY, MAX_FUEL_CAPACITY, Integer.class);
         HashMap<String, Integer> planeCapacity = setPlaneCapacity(planeCode);
         String country = InputService.stringAns("Please enter the country");
-        plane = new Plane(planeCode, fuelCapacity,
+        return new Plane(planeCode, fuelCapacity,
                 planeCapacity.get("tripulationSize"), planeCapacity.get("economySize"),
                 planeCapacity.get("premiumSize"), planeCapacity.get("businessSize"),
                 planeCapacity.get("firstClassSize"), country);
-        return plane;
+
     }
 
-    private HashMap<String, Integer> setPlaneCapacity(String planeCode){
+    private HashMap<String, Integer> setPlaneCapacity(String planeCode) {
         HashMap<String, Integer> planeCapacity = new HashMap<>();
         int size;
         planeCapacity.put("TripulationSize", InputService.setInput("Tripulation size", 4, 8, Integer.class));
