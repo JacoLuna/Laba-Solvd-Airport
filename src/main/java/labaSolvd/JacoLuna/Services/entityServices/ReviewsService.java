@@ -174,7 +174,7 @@ public class ReviewsService implements IService<Review> {
             Field attribute = attributes.get(attIndex);
             Object value;
 
-            if (attribute.equals(String.class)) {
+            if (attribute.getType().equals(String.class)) {
                 value = InputService.stringAns("Please enter the search value");
                 searchList = session.getMapper(ReviewMapper.class).searchByString(attribute.getName(), (String) value);
             } else {
