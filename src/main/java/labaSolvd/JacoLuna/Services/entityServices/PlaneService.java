@@ -24,7 +24,7 @@ public class PlaneService implements IService<Plane> {
     private final PlaneDAO planeDAO;
     private final SourceOptions source;
     private Planes planes;
-    private List<Plane> planeList;
+    public List<Plane> planeList;
     private final int MIN_FUEL_CAPACITY = 150000;
     private final int MAX_FUEL_CAPACITY = 300000;
 
