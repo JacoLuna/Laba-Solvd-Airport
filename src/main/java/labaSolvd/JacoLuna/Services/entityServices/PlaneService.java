@@ -1,8 +1,10 @@
 package labaSolvd.JacoLuna.Services.entityServices;
 
 import jakarta.xml.bind.JAXBException;
+import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.Plane;
 import labaSolvd.JacoLuna.Classes.xmlLists.Planes;
+import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
 import labaSolvd.JacoLuna.DAO.PlaneDAO;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
@@ -12,6 +14,8 @@ import labaSolvd.JacoLuna.Parsers.JAX.Marshaller;
 import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
+import labaSolvd.JacoLuna.myBatysDAO.PlaneMapper;
+import org.apache.ibatis.session.SqlSession;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -20,7 +24,9 @@ public class PlaneService implements IService<Plane> {
     private final PlaneDAO planeDAO;
     private final SourceOptions source;
     private Planes planes;
-    private List<Plane> planeList;
+    public List<Plane> planeList;
+    private final int MIN_FUEL_CAPACITY = 150000;
+    private final int MAX_FUEL_CAPACITY = 300000;
 
     public PlaneService(SourceOptions sourceOptions) {
         source = sourceOptions;
@@ -33,25 +39,7 @@ public class PlaneService implements IService<Plane> {
 
     @Override
     public void add() {
-        Plane plane;
-        String planeCode = enterPlaneCode();
-        int fuelCapacity = InputService.setInput("Fuel capacity", 150000, 300000, Integer.class);
-        int size, tripulationSize, economySize, premiumSize = 0, businessSize = 0, firstClassSize = 0;
-        tripulationSize = InputService.setInput("Tripulation size", 4, 8, Integer.class);
-        size = InputService.setInput("How many people can the " + planeCode + " carry?", 50, 300, Integer.class);
-        economySize = InputService.setInput("economy size ", 0, size, Integer.class);
-        size -= economySize;
-        if (size > 0) {
-            premiumSize = InputService.setInput("Premium size ", 0, size, Integer.class);
-            size -= premiumSize;
-            if (size > 0) {
-                businessSize = InputService.setInput("Business size ", 0, size, Integer.class);
-                firstClassSize = size - businessSize;
-            }
-        }
-        String country = InputService.stringAns("Please enter the country");
-        plane = new Plane(planeCode, fuelCapacity, tripulationSize, economySize, premiumSize, businessSize, firstClassSize, country);
-
+        Plane plane = inputData();
         planeList.add(plane);
         switch (source) {
             case XML -> {
@@ -64,11 +52,46 @@ public class PlaneService implements IService<Plane> {
             }
             case JSON -> JsonParser.parse(planeList, JsonPaths.PLANES);
             case DATA_BASE -> {
-                if (planeDAO.add(plane) != -1) {
-                    Utils.CONSOLE.info("Plane added code:{}", planeCode);
+                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
+                    if (session.getMapper(PlaneMapper.class).insertPlane(plane) > 0) {
+                        session.commit();
+                        Utils.CONSOLE.info("Plane added code:{}", plane.getIdPlane());
+                    }
+                } catch (Exception e) {
+                    Utils.CONSOLE_ERROR.error(e);
                 }
             }
         }
+    }
+
+    private Plane inputData() {
+        String planeCode = enterPlaneCode();
+        int fuelCapacity = InputService.setInput("Fuel capacity", MIN_FUEL_CAPACITY, MAX_FUEL_CAPACITY, Integer.class);
+        HashMap<String, Integer> planeCapacity = setPlaneCapacity(planeCode);
+        String country = InputService.stringAns("Please enter the country");
+        return new Plane(planeCode, fuelCapacity,
+                planeCapacity.get("tripulationSize"), planeCapacity.get("economySize"),
+                planeCapacity.get("premiumSize"), planeCapacity.get("businessSize"),
+                planeCapacity.get("firstClassSize"), country);
+
+    }
+
+    private HashMap<String, Integer> setPlaneCapacity(String planeCode) {
+        HashMap<String, Integer> planeCapacity = new HashMap<>();
+        int size;
+        planeCapacity.put("TripulationSize", InputService.setInput("Tripulation size", 4, 8, Integer.class));
+        size = InputService.setInput("How many people can the " + planeCode + " carry?", 50, 300, Integer.class);
+        planeCapacity.put("economySize", InputService.setInput("economy size ", 0, size, Integer.class));
+        size -= planeCapacity.get("economySize");
+        if (size > 0) {
+            planeCapacity.put("premiumSize", InputService.setInput("Premium size ", 0, size, Integer.class));
+            size -= planeCapacity.get("premiumSize");
+            if (size > 0) {
+                planeCapacity.put("businessSize", InputService.setInput("Business size ", 0, size, Integer.class));
+                planeCapacity.put("firstClassSize", size - planeCapacity.get("businessSize"));
+            }
+        }
+        return planeCapacity;
     }
 
     private String enterPlaneCode() {
@@ -87,7 +110,7 @@ public class PlaneService implements IService<Plane> {
 
     @Override
     public Plane getById() {
-        String id;
+        String id = selectPlaneId();
         switch (source) {
             case XML, JSON -> {
                 try {
@@ -96,7 +119,6 @@ public class PlaneService implements IService<Plane> {
                     else
                         planeList = JsonParser.unparseToList(Plane.class, JsonPaths.PLANES);
 
-                    id = selectPlaneId();
                     if (planeList != null && !planeList.isEmpty()) {
                         return planeList.stream()
                                 .filter(p -> p.getIdPlane().equals(id))
@@ -108,7 +130,11 @@ public class PlaneService implements IService<Plane> {
                 }
             }
             case DATA_BASE -> {
-                return planeDAO.getById(selectPlaneId());
+                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
+                    return session.getMapper(PlaneMapper.class).getPlane(id);
+                } catch (Exception e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                }
             }
         }
         return null;
@@ -117,7 +143,7 @@ public class PlaneService implements IService<Plane> {
     @Override
     public boolean delete() {
         boolean result = false;
-        String id;
+        String id = selectPlaneId();
         switch (source) {
             case XML, JSON -> {
                 try {
@@ -125,13 +151,12 @@ public class PlaneService implements IService<Plane> {
                         planeList = Marshaller.UnMarshallList(Planes.class, XmlPaths.PLANES);
                     else
                         planeList = JsonParser.unparseToList(Plane.class, JsonPaths.PLANES);
-                    id = selectPlaneId();
+
                     if (planeList != null && !planeList.isEmpty()) {
-                        planeList.remove(
-                                planeList.stream()
-                                        .filter(p -> p.getIdPlane().equals(id))
-                                        .findFirst()
-                                        .orElse(null)
+                        planeList.remove(planeList.stream()
+                                .filter(p -> p.getIdPlane().equals(id))
+                                .findFirst()
+                                .orElse(null)
                         );
                     }
                     if (source == SourceOptions.XML) {
@@ -144,7 +169,15 @@ public class PlaneService implements IService<Plane> {
                 }
             }
             case DATA_BASE -> {
-                result = planeDAO.delete(selectPlaneId());
+                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
+                    if (session.getMapper(PlaneMapper.class).deletePlane(id) > 0) {
+                        session.commit();
+                        result = true;
+                    }
+
+                } catch (Exception e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                }
             }
         }
         return result;
@@ -164,7 +197,11 @@ public class PlaneService implements IService<Plane> {
                 return JsonParser.unparseToList(Plane.class, JsonPaths.PLANES);
             }
             case DATA_BASE -> {
-                return planeDAO.getList();
+                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
+                    return session.getMapper(PlaneMapper.class).getAllPlanes();
+                } catch (Exception e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                }
             }
         }
         return null;
@@ -172,7 +209,39 @@ public class PlaneService implements IService<Plane> {
 
     @Override
     public List<Plane> search() {
-        return List.of();
+        List<Plane> searchList = null;
+        try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
+            List<Field> attributes = Arrays.stream(Plane.class.getDeclaredFields()).toList();
+            int attIndex = selectAtt(attributes);
+            Object value;
+
+            if (attributes.get(attIndex).getType().equals(String.class)) {
+                value = InputService.stringAns("Please enter the search value");
+                searchList = session.getMapper(PlaneMapper.class).searchByString(attributes.get(attIndex).getName(), (String) value);
+            } else {
+
+                Class<?> fieldType = attributes.get(attIndex).getType();
+                Utils.CONSOLE.info(fieldType.getName());
+                String prompt = "Please enter the search value";
+                value = switch (fieldType.getName()) {
+                    case "int" -> InputService.setInput(prompt, Integer.class);
+                    case "double" -> InputService.setInput(prompt, Double.class);
+                    case "float" -> InputService.setInput(prompt, Float.class);
+                    case "boolean" -> InputService.booleanAns("is the value true?");
+                    default -> null;
+                };
+
+                if (value != null) {
+                    if (value.getClass() == Boolean.class)
+                        searchList = session.getMapper(PlaneMapper.class).searchByBoolean(attributes.get(attIndex).getName(), (Boolean) value);
+                    else
+                        searchList = session.getMapper(PlaneMapper.class).searchByNumber(attributes.get(attIndex).getName(), (Number) value);
+                }
+            }
+        } catch (Exception e) {
+            Utils.CONSOLE.error("Error while searching passengers: {}", e.getMessage());
+        }
+        return searchList;
     }
 
     @Override
@@ -192,10 +261,12 @@ public class PlaneService implements IService<Plane> {
             }
             case JSON -> JsonParser.parse(planeList, JsonPaths.PLANES);
             case DATA_BASE -> {
-                try {
-                    planeDAO.update(plane);
+                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
+                    if (session.getMapper(PlaneMapper.class).updatePlane(plane) > 0) {
+                        session.commit();
+                    }
                 } catch (Exception e) {
-                    Utils.CONSOLE.error("Error while updating plane: {}", e.getMessage());
+                    Utils.CONSOLE_ERROR.error(e);
                 }
             }
         }

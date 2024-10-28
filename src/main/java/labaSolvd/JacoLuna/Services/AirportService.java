@@ -2,8 +2,11 @@ package labaSolvd.JacoLuna.Services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tools.jconsole.JConsoleContext;
 import labaSolvd.JacoLuna.Classes.Plane;
+import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
 import labaSolvd.JacoLuna.Enums.EntityOptions;
+import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.MenuOptions;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
 import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
@@ -11,7 +14,16 @@ import labaSolvd.JacoLuna.Services.entityServices.PassengerService;
 import labaSolvd.JacoLuna.Services.entityServices.PlaneService;
 import labaSolvd.JacoLuna.Services.entityServices.ReviewsService;
 import labaSolvd.JacoLuna.Utils;
+import labaSolvd.JacoLuna.myBatysDAO.PlaneMapper;
+import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -60,7 +72,7 @@ public class AirportService {
                     do {
                         CRUD = InputService.setInput(menuSrv.EntityMenu(), EntityOptions.values().length, Integer.class);
                         switch (EntityOptions.values()[CRUD]) {
-                            case SEE_ALL -> planeSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case SEE_ALL -> planeSrv.planeList.forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
                             case CREATE -> planeSrv.add();
                             case DELETE -> planeSrv.delete();
                             case UPDATE -> planeSrv.update();
@@ -75,9 +87,12 @@ public class AirportService {
                     do {
                         CRUD = InputService.setInput(menuSrv.EntityMenu(), EntityOptions.values().length, Integer.class);
                         switch (EntityOptions.values()[CRUD]) {
+                            case SEE_ALL -> reviewsSrv.reviewList.forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
                             case CREATE -> reviewsSrv.add();
-                            case SEE_ALL -> reviewsSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
-                            case GET_ONE -> Utils.CONSOLE.info(planeSrv.getById().toString());
+                            case DELETE -> reviewsSrv.delete();
+                            case UPDATE -> reviewsSrv.update();
+                            case SEARCH -> reviewsSrv.search().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case GET_ONE -> Utils.CONSOLE.info(reviewsSrv.getById().toString());
                         }
                     } while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
                 }

@@ -1,8 +1,6 @@
 package labaSolvd.JacoLuna.Parsers.JSON;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import labaSolvd.JacoLuna.Classes.Plane;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Services.FileService;
 import labaSolvd.JacoLuna.Utils;
