@@ -18,17 +18,24 @@ public class CrewMember extends People{
     @XmlElement(name = "flightHours")
     private int flightHours;
 
+    private void initialize(int flightHours, String role) {
+        this.flightHours = flightHours;
+        this.role = role;
+    }
+
     public CrewMember() {}
     public CrewMember(String name, String surname, String email, int age, String role, int flightHours) {
         super(name, surname, email, age);
-        this.role = role;
-        this.flightHours = flightHours;
+        initialize(flightHours, role);
+    }
+    public CrewMember(long idPeople, String name, String surname, String email, int age, String role, int flightHours) {
+        super(idPeople, name, surname, email, age);
+        initialize(flightHours, role);
     }
     public CrewMember(long idPeople, String name, String surname, String email, int age, long idCrewMember, String role, int flightHours) {
         super(idPeople, name, surname, email, age);
         this.idCrewMember = idCrewMember;
-        this.role = role;
-        this.flightHours = flightHours;
+        initialize(flightHours, role);
     }
 
     public long getIdCrewMember() {

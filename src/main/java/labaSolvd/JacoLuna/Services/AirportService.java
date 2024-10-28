@@ -8,6 +8,7 @@ import labaSolvd.JacoLuna.Enums.EntityOptions;
 import labaSolvd.JacoLuna.Enums.MenuOptions;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
 import labaSolvd.JacoLuna.Interfaces.IService;
+import labaSolvd.JacoLuna.Services.entityServices.CrewMemberService;
 import labaSolvd.JacoLuna.Services.entityServices.PassengerService;
 import labaSolvd.JacoLuna.Services.entityServices.PlaneService;
 import labaSolvd.JacoLuna.Services.entityServices.ReviewsService;
@@ -17,24 +18,16 @@ import java.util.HashMap;
 
 public class AirportService {
     MenuService menuSrv;
-    IService<Passenger> passengerSrv;
-    IService<CrewMember> crewMemberSrv;
-    IService<Plane> planeSrv;
-    IService<Review> reviewsSrv;
-    HashMap<MenuOptions, IService<?>> services = new HashMap<MenuOptions, IService<?>>();
-
+    HashMap<MenuOptions, IService<?>> services = new HashMap<>();
     public AirportService() {
         menuSrv = new MenuService();
     }
 
     public void startProgram(SourceOptions source) {
-        passengerSrv = new PassengerService(source);
-        planeSrv = new PlaneService(source);
-        reviewsSrv = new ReviewsService(source);
-
-        services.put(MenuOptions.PASSENGER, passengerSrv);
-        services.put(MenuOptions.PLANE, planeSrv);
-        services.put(MenuOptions.REVIEW, reviewsSrv);
+        services.put(MenuOptions.PASSENGER, new PassengerService(source));
+        services.put(MenuOptions.CREW_MEMBER, new CrewMemberService(source));
+        services.put(MenuOptions.PLANE, new PlaneService(source));
+        services.put(MenuOptions.REVIEW, new ReviewsService(source));
 
         int ans;
         do {

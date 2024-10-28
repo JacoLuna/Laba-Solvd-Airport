@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Classes.People">
+    <resultMap id="peopleResultMap" type="Classes.People">
+        <id property="id" column="idPeople"/>
+        <result property="name" column="name"/>
+        <result property="surname" column="surname"/>
+        <result property="Email" column="Email"/>
+        <result property="age" column="age"/>
+    </resultMap>
+
+    <select id="get" parameterType="map" resultType="Classes.People" resultMap="peopleResultMap">
+        SELECT * FROM people
+        <where>
+            <foreach collection="_parameter" index="key" item="value" separator=" AND ">
+                ${key} = #{value}
+            </foreach>
+        </where>;
+    </select>
+
+    <insert id="create" parameterType="Classes.People">
+        INSERT INTO people (idPeople, name, surname, Email, age)
+        VALUES (#{idPeople}, #{name}, #{surname}, #{Email}, #{age});
+    </insert>
+
+    <update id="update" parameterType="map">
+        UPDATE people
+        <set>
+            <foreach collection="values" index="key" item="value" separator=",">
+                ${key} = #{value}
+            </foreach>
+        </set>
+        <where>
+            <foreach collection="filters" index="key" item="value" separator=" AND ">
+                ${key} = #{value}
+            </foreach>
+        </where>;
+    </update>
+
+    <delete id="delete" parameterType="map">
+        DELETE FROM people
+        <where>
+            <foreach collection="_parameter" index="key" item="value" separator=" AND ">
+                ${key} = #{value}
+            </foreach>
+        </where>;
+    </delete>
+</mapper>

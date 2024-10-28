@@ -5,8 +5,12 @@ import labaSolvd.JacoLuna.Classes.People;
 import labaSolvd.JacoLuna.Classes.People;
 import labaSolvd.JacoLuna.Connection.ConnectionPool;
 import labaSolvd.JacoLuna.Connection.ReusableConnection;
+import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
 import labaSolvd.JacoLuna.Interfaces.IDAO;
 import labaSolvd.JacoLuna.Utils;
+import labaSolvd.JacoLuna.myBatysDAO.CrewMemberMapper;
+import labaSolvd.JacoLuna.myBatysDAO.PeopleMapper;
+import org.apache.ibatis.session.SqlSession;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,10 +50,8 @@ public class PeopleDAO implements IDAO<People> {
                     id = generatedKeys.getLong(1);
                 }
             }
-        }catch (SQLException e) {
+        }catch (Exception e ) {
             throw new RuntimeException("Couldn't add People", e);
-        }catch (Exception e) {
-            Utils.CONSOLE_ERROR.error(e);
         }
         return id;
     }
@@ -127,6 +129,44 @@ public class PeopleDAO implements IDAO<People> {
         }catch (Exception e) {
             Utils.CONSOLE_ERROR.error(e);
         }
+        return result;
+    }
+
+    //Mybatis implementation
+
+    public List<People> getListMybatis() {
+        return List.of();
+    }
+    public long addMybatis(People people) {
+        long id = -1;
+        try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
+            if (session.getMapper(PeopleMapper.class).insertPeople(people) > 0) {
+                session.commit();
+                id = people.getIdPeople();
+            }
+        } catch (Exception e) {
+            Utils.CONSOLE_ERROR.error(e);
+        }
+        return id;
+    }
+    public People getByIdMybatis(long id) {
+        return null;
+    }
+
+    public long addMybatis(Map<String, Object> att) {
+        long id = -1;
+        return id;
+    }
+    public boolean updateMybatis(People people) {
+        boolean result = false;
+        return result;
+    }
+    public boolean updateMybatis(Map<String, Object> att) {
+        boolean result = false;
+        return result;
+    }
+    public boolean deleteMybatis(long id) {
+        boolean result = false;
         return result;
     }
 }

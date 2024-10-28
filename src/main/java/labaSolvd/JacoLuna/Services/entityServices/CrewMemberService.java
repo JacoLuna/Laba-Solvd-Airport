@@ -1,9 +1,15 @@
 package labaSolvd.JacoLuna.Services.entityServices;
 
 import jakarta.xml.bind.JAXBException;
+import labaSolvd.JacoLuna.Classes.CrewMember;
 import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.People;
+import labaSolvd.JacoLuna.Classes.Review;
 import labaSolvd.JacoLuna.Classes.xmlLists.Persons;
+import labaSolvd.JacoLuna.Classes.xmlLists.Reviews;
+import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
+import labaSolvd.JacoLuna.DAO.CrewMemberDAO;
+import labaSolvd.JacoLuna.DAO.EntityDAO;
 import labaSolvd.JacoLuna.DAO.PassengerDAO;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
@@ -14,6 +20,9 @@ import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Parsers.SAX.PeopleSaxParser;
 import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
+import labaSolvd.JacoLuna.myBatysDAO.CrewMemberMapper;
+import labaSolvd.JacoLuna.myBatysDAO.ReviewMapper;
+import org.apache.ibatis.session.SqlSession;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,50 +34,45 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class CrewMemberService implements IService<Passenger> {
+public class CrewMemberService implements IService<CrewMember> {
 
-    private final PassengerDAO passengerDAO;
     private final PeopleService peopleService;
     private final SourceOptions source;
     private Persons persons;
-    private final List<Passenger> passengersList;
+    private final List<CrewMember> crewMembersList;
+    private CrewMemberDAO crewMemberDAO;
 
     public CrewMemberService(SourceOptions source) {
-        this.passengerDAO = new PassengerDAO();
         this.peopleService = new PeopleService(source);
         this.source = source;
         if (this.source == SourceOptions.XML) {
             persons = new Persons();
         }
-        passengersList = getAll();
+        if (this.source == SourceOptions.DATA_BASE) {
+            crewMemberDAO = new CrewMemberDAO();
+        }
+        crewMembersList = getAll();
     }
 
     public void add() {
-        String name = InputService.stringAns("Please enter your name: ");
-        String surname = InputService.stringAns("Please enter your surname: ");
-        String email = InputService.stringAns("Please enter your email: ");
-        int age = InputService.setInput("Please enter your age: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.class);
-        boolean VIP = InputService.booleanAns("Is " + name + " VIP?");
-        boolean hasSpecialNeeds = InputService.booleanAns("Does " + name + " have special needs?");
-
+        String name = InputService.stringAns("Please input name: ");
+        String surname = InputService.stringAns("Please input surname: ");
+        String email = InputService.stringAns("Please input email: ");
+        int age = InputService.setInput("Please input age: ", Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.class);
+        String role = InputService.stringAns("Please input role: ");
         long idPeople = peopleService.add(name, surname, email, age);
-        Passenger passenger = new Passenger(idPeople, name, surname, email, age, VIP, 0, hasSpecialNeeds);
-        addPassenger(passenger);
+        CrewMember crewMember = new CrewMember(idPeople, name, surname, email, age, role, 0);
+        addCrewMember(crewMember);
         switch (source) {
-            case XML -> addPassengerWithXML(passenger);
-            case JSON -> JsonParser.parse(passengersList, JsonPaths.PEOPLE);
-            case DATA_BASE -> {
-                long id = passengerDAO.add(passenger);
-                if (id != -1) {
-                    Utils.CONSOLE.info("Passenger {} created id:{}", name, id);
-                }
-            }
+            case XML -> addCrewMemberWithXML(crewMember);
+            case JSON -> JsonParser.parse(crewMembersList, JsonPaths.PEOPLE);
+            case DATA_BASE -> crewMemberDAO.add(crewMember);
         }
     }
 
-    private void addPassengerWithXML(Passenger passenger) {
+    private void addCrewMemberWithXML(CrewMember crewMember) {
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-        List<Passenger> passengers = new ArrayList<>();
+        List<CrewMember> crewMembers = new ArrayList<>();
         long id = 1;
         try {
             SAXParser saxParser = saxParserFactory.newSAXParser();
@@ -77,82 +81,101 @@ public class CrewMemberService implements IService<Passenger> {
             List<People> empList = handler.getEmpList();
             if (empList != null) {
                 if (!empList.isEmpty()) {
-                    empList.forEach(p -> {
-                        if (p.getClass().equals(Passenger.class)) {
-                            passengers.add((Passenger) p);
+                    empList.forEach(c -> {
+                        if (c.getClass().equals(CrewMember.class)) {
+                            crewMembers.add((CrewMember) c);
                         }
                     });
 
-                    id = Collections.max(passengers, Comparator.comparing(Passenger::getIdPassenger)).getIdPassenger() + 1;
+                    id = Collections.max(crewMembers, Comparator.comparing(CrewMember::getIdCrewMember)).getIdCrewMember() + 1;
                 }
             }
-            passenger.setIdPassenger(id);
-            addPassenger(passenger);
+            crewMember.setIdCrewMember(id);
+            addCrewMember(crewMember);
             Marshaller.MarshallList(persons, Persons.class, XmlPaths.PEOPLE);
         } catch (ParserConfigurationException | SAXException | IOException | JAXBException e) {
             Utils.CONSOLE_ERROR.error(e);
         }
     }
 
-    private void addPassenger(Passenger passenger) {
+    private void addCrewMember(CrewMember crewMember) {
         if (persons != null)
-            persons.getPersons().add(passenger);
-        passengersList.add(passenger);
+            persons.getPersons().add(crewMember);
+        crewMembersList.add(crewMember);
     }
 
-    private void delPassenger(Passenger passenger) {
+    private void delCrewMember(CrewMember crewMember) {
         if (persons != null)
-            persons.getPersons().remove(passenger);
-        passengersList.remove(passenger);
+            persons.getPersons().remove(crewMember);
+        crewMembersList.remove(crewMember);
     }
 
-    private void updatePassenger(Passenger passenger) {
-        int index = passengersList.indexOf(passenger);
-        passengersList.set(index, passenger);
+    private void updateCrewMember(CrewMember crewMember) {
+        int index = crewMembersList.indexOf(crewMember);
+        crewMembersList.set(index, crewMember);
         if (persons != null) {
-            index = persons.getPersons().indexOf(passenger);
-            persons.getPersons().set(index, passenger);
+            index = persons.getPersons().indexOf(crewMember);
+            persons.getPersons().set(index, crewMember);
         }
     }
 
-    public Passenger getById() {
-        return passengerDAO.getById(selectPassengerId());
+    public CrewMember getById() {
+        long id = selectCrewMemberId();
+        return switch (source) {
+            case XML -> null;
+            case JSON -> null;
+            case DATA_BASE -> EntityDAO.executeQuery(CrewMemberMapper.class, "getCrewMember", id);
+            default -> null;
+        };
     }
 
     public boolean delete() {
         boolean result = false;
-        try {
-            passengerDAO.delete(selectPassengerId());
-        } catch (Exception e) {
-            Utils.CONSOLE.error("Error while deleting passenger");
+        long id = selectCrewMemberId();
+        switch (source) {
+            case XML -> result = false;
+            case JSON -> result = false;
+            case DATA_BASE -> EntityDAO.executeQuery(CrewMemberMapper.class, "deleteCrewMember", id);
         }
         return result;
     }
 
-    public List<Passenger> getAll() {
-        return passengerDAO.getList();
+    public List<CrewMember> getAll() {
+        return switch (source) {
+            case XML -> {
+                try {
+                    yield Marshaller.UnMarshallList(Reviews.class, XmlPaths.PEOPLE);
+                } catch (JAXBException e) {
+                    Utils.CONSOLE_ERROR.error(e);
+                    yield null;
+                }
+            }
+            case JSON -> JsonParser.unparseToList(CrewMember.class, JsonPaths.PEOPLE);
+            case DATA_BASE -> EntityDAO.executeQuery(CrewMemberMapper.class, "getAllCrewMembers");
+            default -> null;
+        };
     }
 
     public void update() {
-        Passenger passenger = getById();
-        updatePassengerAttributes(passenger);
-        try {
-            passengerDAO.update(passenger);
-        } catch (Exception e) {
-            Utils.CONSOLE.error("Error while updating passenger: {}", e.getMessage());
-        }
+        CrewMember crewMember = getById();
+        updateCrewMemberAttributes(crewMember);
+//        try {
+//            passengerDAO.update(passenger);
+//        } catch (Exception e) {
+//            Utils.CONSOLE.error("Error while updating passenger: {}", e.getMessage());
+//        }
     }
 
-    public List<Passenger> search() {
-        List<Field> attributes = getPassengerAttributes();
-        List<Passenger> passengers = new ArrayList<>();
+    public List<CrewMember> search() {
+        List<Field> attributes = getCrewMemberAttributes();
+        List<CrewMember> crewMembers = new ArrayList<>();
         try {
             Object value;
             int attIndex = selectAtt(attributes);
 
             if (attributes.get(attIndex).getType().equals(String.class)) {
                 value = InputService.stringAns("Please enter the search value");
-                passengers = passengerDAO.search(attributes.get(attIndex).getName(), (String) value);
+//                crewMembers = passengerDAO.search(attributes.get(attIndex).getName(), (String) value);
             } else {
 
                 Class<?> fieldType = attributes.get(attIndex).getType();
@@ -164,13 +187,13 @@ public class CrewMemberService implements IService<Passenger> {
                     case "boolean" -> InputService.booleanAns("is the value true?");
                     default -> null;
                 };
-                if (value != null)
-                    passengers = passengerDAO.search(attributes.get(attIndex).getName(), value);
+//                if (value != null)
+//                    passengers = passengerDAO.search(attributes.get(attIndex).getName(), value);
             }
         } catch (Exception e) {
-            Utils.CONSOLE.error("Error while searching passengers: {}", e.getMessage());
+            Utils.CONSOLE.error("Error while searching crewMembers: {}", e.getMessage());
         }
-        return passengers;
+        return crewMembers;
     }
 
     private int selectAtt(List<Field> attributes) {
@@ -184,50 +207,47 @@ public class CrewMemberService implements IService<Passenger> {
         return ans;
     }
 
-    private long selectPassengerId() {
-        List<Passenger> passengers = getAll();
-        StringBuilder sb = new StringBuilder("Select the id of the passenger");
+    private long selectCrewMemberId() {
+        List<CrewMember> crewMembers = getAll();
+        StringBuilder sb = new StringBuilder("Select the id of the crew member");
         List<Long> ids = new ArrayList<>();
-        passengers.forEach(p -> {
-            ids.add(p.getIdPassenger());
-            sb.append("\n").append(p.getIdPassenger()).append(" ").append(p.getName());
+        crewMembers.forEach(c -> {
+            ids.add(c.getIdCrewMember());
+            sb.append("\n").append(c.getIdCrewMember()).append(" ").append(c.getName());
         });
         sb.append("\n");
         return InputService.setInput(sb.toString(), ids, Long.class);
     }
 
-    private void updatePassengerAttributes(Passenger passenger) {
-        List<Field> attributes = getPassengerAttributes();
+    private void updateCrewMemberAttributes(CrewMember crewMember) {
+        List<Field> attributes = getCrewMemberAttributes();
         int ans;
         do {
             ans = selectAtt(attributes);
             if (ans < attributes.size()) {
-                updateAttribute(passenger, attributes.get(ans));
+                updateAttribute(crewMember, attributes.get(ans));
             }
         } while (ans != attributes.size());
     }
 
-    private List<Field> getPassengerAttributes() {
-        List<Field> superAttributes = new LinkedList<>(Arrays.asList(Passenger.class.getSuperclass().getDeclaredFields()));
-        List<Field> childAttributes = new LinkedList<>(Arrays.asList(Passenger.class.getDeclaredFields()));
+    private List<Field> getCrewMemberAttributes() {
+        List<Field> superAttributes = new LinkedList<>(Arrays.asList(CrewMember.class.getSuperclass().getDeclaredFields()));
+        List<Field> childAttributes = new LinkedList<>(Arrays.asList(CrewMember.class.getDeclaredFields()));
         childAttributes.removeFirst();
         return Stream.concat(superAttributes.stream(), childAttributes.stream()).toList();
     }
 
-    private void updateAttribute(Passenger passenger, Field field) {
+    private void updateAttribute(CrewMember crewMember, Field field) {
         field.setAccessible(true);
         switch (field.getName()) {
-            case "name" -> passenger.setName(InputService.stringAns("Name: "));
-            case "surname" -> passenger.setSurname(InputService.stringAns("Surname: "));
-            case "email" -> passenger.setEmail(InputService.stringAns("Email: "));
-            case "age" -> passenger.setAge(InputService.setInput(
-                    "How old is " + passenger.getName() + "?", 0, Integer.MAX_VALUE, Integer.class));
-            case "VIP" ->
-                    passenger.setVIP(InputService.setInput("Is " + passenger.getName() + " VIP?\n0 - No\n1 - Yes", Arrays.asList(0, 1), Integer.class) == 1);
-            case "flightPoints" -> passenger.setFlightPoints(InputService.setInput(
-                    "How many flight points does the passenger have?", 0, Integer.MAX_VALUE, Integer.class));
-            case "hasSpecialNeeds" -> passenger.setHasSpecialNeeds(InputService.setInput(
-                    "Does " + passenger.getName() + " have special needs?\n0 - No\n1 - Yes", Arrays.asList(0, 1), Integer.class) == 1);
+            case "name" -> crewMember.setName(InputService.stringAns("Name: "));
+            case "surname" -> crewMember.setSurname(InputService.stringAns("Surname: "));
+            case "email" -> crewMember.setEmail(InputService.stringAns("Email: "));
+            case "age" -> crewMember.setAge(InputService.setInput(
+                    "How old is " + crewMember.getName() + "?", 0, Integer.MAX_VALUE, Integer.class));
+            case "role" -> crewMember.setRole(InputService.stringAns("Role: "));
+            case "flightHours" ->
+                    crewMember.setFlightHours(InputService.setInput("Flight hours: ", 0, Integer.MAX_VALUE, Integer.class));
         }
     }
 }
