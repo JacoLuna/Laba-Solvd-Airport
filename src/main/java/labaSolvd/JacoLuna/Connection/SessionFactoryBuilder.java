@@ -3,7 +3,6 @@ package labaSolvd.JacoLuna.Connection;
 import labaSolvd.JacoLuna.myBatysDAO.PlaneMapper;
 import labaSolvd.JacoLuna.myBatysDAO.ReviewMapper;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
-import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
@@ -14,7 +13,6 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 
 public class SessionFactoryBuilder {
 

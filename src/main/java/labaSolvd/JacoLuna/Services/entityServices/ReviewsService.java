@@ -1,9 +1,7 @@
 package labaSolvd.JacoLuna.Services.entityServices;
 
 import jakarta.xml.bind.JAXBException;
-import labaSolvd.JacoLuna.Classes.Plane;
 import labaSolvd.JacoLuna.Classes.Review;
-import labaSolvd.JacoLuna.Classes.xmlLists.Planes;
 import labaSolvd.JacoLuna.Classes.xmlLists.Reviews;
 import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
@@ -14,7 +12,6 @@ import labaSolvd.JacoLuna.Parsers.JAX.Marshaller;
 import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
-import labaSolvd.JacoLuna.myBatysDAO.PlaneMapper;
 import labaSolvd.JacoLuna.myBatysDAO.ReviewMapper;
 import org.apache.ibatis.session.SqlSession;
 
@@ -27,7 +24,7 @@ public class ReviewsService implements IService<Review> {
 
     private final SourceOptions source;
     private Reviews reviews;
-    private List<Review> reviewList;
+    public List<Review> reviewList;
     public ReviewsService(SourceOptions source) {
         this.source = source;
         if (source == SourceOptions.XML){
