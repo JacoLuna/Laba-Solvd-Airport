@@ -25,6 +25,8 @@ public class PlaneService implements IService<Plane> {
     private final SourceOptions source;
     private Planes planes;
     private List<Plane> planeList;
+    private final int MIN_FUEL_CAPACITY = 150000;
+    private final int MAX_FUEL_CAPACITY = 300000;
 
     public PlaneService(SourceOptions sourceOptions) {
         source = sourceOptions;
@@ -63,25 +65,33 @@ public class PlaneService implements IService<Plane> {
     }
 
     private Plane inputData() {
-        Plane plane;
         String planeCode = enterPlaneCode();
-        int fuelCapacity = InputService.setInput("Fuel capacity", 150000, 300000, Integer.class);
-        int size, tripulationSize, economySize, premiumSize = 0, businessSize = 0, firstClassSize = 0;
-        tripulationSize = InputService.setInput("Tripulation size", 4, 8, Integer.class);
+        int fuelCapacity = InputService.setInput("Fuel capacity", MIN_FUEL_CAPACITY, MAX_FUEL_CAPACITY, Integer.class);
+        HashMap<String, Integer> planeCapacity = setPlaneCapacity(planeCode);
+        String country = InputService.stringAns("Please enter the country");
+        return new Plane(planeCode, fuelCapacity,
+                planeCapacity.get("tripulationSize"), planeCapacity.get("economySize"),
+                planeCapacity.get("premiumSize"), planeCapacity.get("businessSize"),
+                planeCapacity.get("firstClassSize"), country);
+
+    }
+
+    private HashMap<String, Integer> setPlaneCapacity(String planeCode) {
+        HashMap<String, Integer> planeCapacity = new HashMap<>();
+        int size;
+        planeCapacity.put("TripulationSize", InputService.setInput("Tripulation size", 4, 8, Integer.class));
         size = InputService.setInput("How many people can the " + planeCode + " carry?", 50, 300, Integer.class);
-        economySize = InputService.setInput("economy size ", 0, size, Integer.class);
-        size -= economySize;
+        planeCapacity.put("economySize", InputService.setInput("economy size ", 0, size, Integer.class));
+        size -= planeCapacity.get("economySize");
         if (size > 0) {
-            premiumSize = InputService.setInput("Premium size ", 0, size, Integer.class);
-            size -= premiumSize;
+            planeCapacity.put("premiumSize", InputService.setInput("Premium size ", 0, size, Integer.class));
+            size -= planeCapacity.get("premiumSize");
             if (size > 0) {
-                businessSize = InputService.setInput("Business size ", 0, size, Integer.class);
-                firstClassSize = size - businessSize;
+                planeCapacity.put("businessSize", InputService.setInput("Business size ", 0, size, Integer.class));
+                planeCapacity.put("firstClassSize", size - planeCapacity.get("businessSize"));
             }
         }
-        String country = InputService.stringAns("Please enter the country");
-        plane = new Plane(planeCode, fuelCapacity, tripulationSize, economySize, premiumSize, businessSize, firstClassSize, country);
-        return plane;
+        return planeCapacity;
     }
 
     private String enterPlaneCode() {
