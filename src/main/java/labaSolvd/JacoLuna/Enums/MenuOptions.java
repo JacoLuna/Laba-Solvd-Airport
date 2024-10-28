@@ -1,7 +1,8 @@
 package labaSolvd.JacoLuna.Enums;
 
 public enum MenuOptions{
-    PEOPLE,
+    PASSENGER,
+    CREW_MEMBER,
     PLANE,
     CLASS,
     REVIEW,

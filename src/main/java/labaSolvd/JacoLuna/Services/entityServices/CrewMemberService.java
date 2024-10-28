@@ -25,7 +25,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class PassengerService implements IService<Passenger> {
+public class CrewMemberService implements IService<Passenger> {
 
     private final PassengerDAO passengerDAO;
     private final PeopleService peopleService;
@@ -33,7 +33,7 @@ public class PassengerService implements IService<Passenger> {
     private Persons persons;
     private final List<Passenger> passengersList;
 
-    public PassengerService(SourceOptions source) {
+    public CrewMemberService(SourceOptions source) {
         this.passengerDAO = new PassengerDAO();
         this.peopleService = new PeopleService(source);
         this.source = source;

@@ -1,105 +1,62 @@
 package labaSolvd.JacoLuna.Services;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.tools.jconsole.JConsoleContext;
+import labaSolvd.JacoLuna.Classes.CrewMember;
+import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.Plane;
-import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
+import labaSolvd.JacoLuna.Classes.Review;
 import labaSolvd.JacoLuna.Enums.EntityOptions;
-import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.MenuOptions;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
-import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
+import labaSolvd.JacoLuna.Interfaces.IService;
 import labaSolvd.JacoLuna.Services.entityServices.PassengerService;
 import labaSolvd.JacoLuna.Services.entityServices.PlaneService;
 import labaSolvd.JacoLuna.Services.entityServices.ReviewsService;
 import labaSolvd.JacoLuna.Utils;
-import labaSolvd.JacoLuna.myBatysDAO.PlaneMapper;
-import org.apache.ibatis.mapping.Environment;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.apache.ibatis.transaction.TransactionFactory;
-import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
-import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
 
 public class AirportService {
-    PassengerService passengerSrv;
-    PlaneService planeSrv;
-    ReviewsService reviewsSrv;
     MenuService menuSrv;
+    IService<Passenger> passengerSrv;
+    IService<CrewMember> crewMemberSrv;
+    IService<Plane> planeSrv;
+    IService<Review> reviewsSrv;
+    HashMap<MenuOptions, IService<?>> services = new HashMap<MenuOptions, IService<?>>();
+
     public AirportService() {
         menuSrv = new MenuService();
     }
 
     public void startProgram(SourceOptions source) {
-        int ans, CRUD;
         passengerSrv = new PassengerService(source);
         planeSrv = new PlaneService(source);
         reviewsSrv = new ReviewsService(source);
 
+        services.put(MenuOptions.PASSENGER, passengerSrv);
+        services.put(MenuOptions.PLANE, planeSrv);
+        services.put(MenuOptions.REVIEW, reviewsSrv);
+
+        int ans;
         do {
             ans = InputService.setInput(MenuOptions.printMenu(), MenuOptions.values().length, Integer.class);
-            switch (MenuOptions.values()[ans]) {
-                case MenuOptions.PEOPLE -> {
-                    ans = InputService.setInput(menuSrv.peopleMenu(), MenuOptions.PEOPLE.ordinal(), 2, Integer.class);
-                    do {
-                        CRUD = InputService.setInput(menuSrv.EntityMenu(), EntityOptions.values().length, Integer.class);
-                        if (ans == MenuService.peopleOptions.PASSENGER.ordinal()) {
-                            switch (EntityOptions.values()[CRUD]) {
-                                case SEE_ALL ->
-                                        passengerSrv.getAll().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
-                                case CREATE -> passengerSrv.add();
-                                case DELETE -> passengerSrv.delete();
-                                case UPDATE -> passengerSrv.update();
-                                case SEARCH ->
-                                        passengerSrv.search().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
-                                case GET_ONE -> Utils.CONSOLE.info(passengerSrv.getById().toString());
-                            }
-                        } else if (ans == MenuService.peopleOptions.CREW_MEMBER.ordinal()) {
-
-                        }
-                    } while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
-                }
-                case CLASS -> {
-                }
-                case PLANE -> {
+            int menuIndex = ans;
+            services.forEach((menuOptions, service) -> {
+                if (menuOptions == MenuOptions.values()[menuIndex]) {
+                    int CRUD;
                     do {
                         CRUD = InputService.setInput(menuSrv.EntityMenu(), EntityOptions.values().length, Integer.class);
                         switch (EntityOptions.values()[CRUD]) {
-                            case SEE_ALL -> planeSrv.planeList.forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
-                            case CREATE -> planeSrv.add();
-                            case DELETE -> planeSrv.delete();
-                            case UPDATE -> planeSrv.update();
-                            case SEARCH ->
-                                    planeSrv.search().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
-                            case GET_ONE -> Utils.CONSOLE.info(planeSrv.getById().toString());
-
+                            case SEE_ALL -> service.getAll().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case CREATE -> service.add();
+                            case DELETE -> service.delete();
+                            case UPDATE -> service.update();
+                            case SEARCH -> service.search().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
+                            case GET_ONE -> Utils.CONSOLE.info(service.getById().toString());
                         }
                     } while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
                 }
-                case REVIEW ->{
-                    do {
-                        CRUD = InputService.setInput(menuSrv.EntityMenu(), EntityOptions.values().length, Integer.class);
-                        switch (EntityOptions.values()[CRUD]) {
-                            case SEE_ALL -> reviewsSrv.reviewList.forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
-                            case CREATE -> reviewsSrv.add();
-                            case DELETE -> reviewsSrv.delete();
-                            case UPDATE -> reviewsSrv.update();
-                            case SEARCH -> reviewsSrv.search().forEach(p -> Utils.CONSOLE.info("{}", p.toString()));
-                            case GET_ONE -> Utils.CONSOLE.info(reviewsSrv.getById().toString());
-                        }
-                    } while (EntityOptions.values()[CRUD] != EntityOptions.EXIT);
-                }
-            }
+            });
         } while (ans != MenuOptions.END_SESSION.ordinal());
-
     }
-
 
 }
