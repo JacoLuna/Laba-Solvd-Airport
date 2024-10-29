@@ -5,7 +5,6 @@ import labaSolvd.JacoLuna.Utils;
 import org.apache.ibatis.session.SqlSession;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 
 public class EntityDAO {
 
@@ -13,7 +12,9 @@ public class EntityDAO {
         try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
             T mapper = session.getMapper(mapperClass);
             Method method = findMethod(mapperClass, methodName, params);
-            return (K) method.invoke(mapper, params);
+            K result = (K) method.invoke(mapper, params);
+            session.commit();
+            return result;
         } catch (Exception e) {
             Utils.CONSOLE_ERROR.error("Error executing query: {}", e);
             return null;
@@ -22,7 +23,6 @@ public class EntityDAO {
 
     private static <T> Method findMethod(Class<T> mapperClass, String methodName, Object[] params) throws NoSuchMethodException {
         for (Method method : mapperClass.getMethods()) {
-//            System.out.println("method.getName() " + method.getName() + " methodName " + methodName + " method.getParameterCount() " + method.getParameterCount() + " params.length " + params.length);
             if (method.getName().equals(methodName) && method.getParameterCount() == params.length) {
                 return method;
             }

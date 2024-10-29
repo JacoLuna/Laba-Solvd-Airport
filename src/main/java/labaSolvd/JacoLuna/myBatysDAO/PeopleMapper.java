@@ -10,9 +10,9 @@ public interface PeopleMapper {
     @Select("SELECT * FROM People WHERE idPeople = #{idPeople}")
     People getPeople(long idPeople);
 
-    @Insert("INSERT INTO People (name,surname,email,age)" +
+    @Insert("INSERT INTO People (name,surname,email,age) " +
             "VALUES (#{name},#{surname},#{email},#{age})")
-    @Options(useGeneratedKeys = true, keyColumn = "idPeople", keyProperty = "idPeople")
+//    @Options(useGeneratedKeys = true, keyColumn = "idPeople", keyProperty = "idPeople")
     int insertPeople(People people);
     
     @Update("UPDATE People SET name = #{name}, surname = #{surname}, email = #{email}, age = #{age} " +
@@ -29,8 +29,6 @@ public interface PeopleMapper {
     List<People> searchByString(@Param("column") String column,@Param("value") String value);
 
     @Select("SELECT * FROM People WHERE ${column} = #{value}")
-    <T extends Number>List<People> searchByNumber(@Param("column") String column,@Param("value") T value);
+    <T>List<People> searchByOther(@Param("column") String column,@Param("value") T value);
 
-    @Select("SELECT * FROM People WHERE ${column} = #{value}")
-    List<Plane> searchByBoolean(@Param("column") String column, boolean value);
 }

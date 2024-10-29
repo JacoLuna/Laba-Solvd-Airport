@@ -35,15 +35,6 @@ public class CrewMemberDAO implements IDAO<CrewMember> {
 
     @Override
     public long add(CrewMember crewMember) {
-        try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-            peopleDAO.add(crewMember);
-            if (session.getMapper(CrewMemberMapper.class).insertCrewMember(crewMember) > 0) {
-                session.commit();
-                Utils.CONSOLE.info("Crew member added code:{}", crewMember.getIdCrewMember());
-            }
-        } catch (Exception e) {
-            Utils.CONSOLE_ERROR.error(e);
-        }
         return 0;
     }
 

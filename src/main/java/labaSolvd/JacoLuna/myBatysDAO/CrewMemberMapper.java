@@ -11,8 +11,9 @@ public interface CrewMemberMapper {
             "WHERE idCrewMember = #{idCrewMember}")
     CrewMember getCrewMember(long idCrewMember);
 
-    @Insert("INSERT INTO crewMember (idCrewMember,role,flightHours,idPeople)" +
-            "VALUES (#{idCrewMember},#{role},#{flightHours},#{idPeople})")
+    @Insert("INSERT INTO crewMember (role,flightHours,idPeople) " +
+            "VALUES (#{role},#{flightHours},#{idPeople})")
+//    @Options(useGeneratedKeys = true, keyColumn = "idCrewMember", keyProperty = "idCrewMember")
     int insertCrewMember(CrewMember crewMember);
     
     @Update("UPDATE CrewMember SET role = #{role}, flightHours = #{flightHours} " +
@@ -31,9 +32,5 @@ public interface CrewMemberMapper {
 
     @Select("SELECT * FROM crewMember as cm INNER JOIN people as p ON cm.idPeople = p.idPeople " +
             "WHERE ${column} = #{value}")
-    <T extends Number>List<CrewMember> searchByNumber(@Param("column") String column,@Param("value") T value);
-
-    @Select("SELECT * FROM crewMember as cm INNER JOIN people as p ON cm.idPeople = p.idPeople " +
-            "WHERE ${column} = #{value}")
-    List<Plane> searchByBoolean(@Param("column") String column, boolean value);
+    <T>List<CrewMember> searchByOther(@Param("column") String column,@Param("value") T value);
 }

@@ -75,4 +75,18 @@ public class CrewMember extends People{
     public int hashCode() {
         return super.hashCode() + (int)idCrewMember + role.length() + flightHours;
     }
+
+    @Override
+    public String toString() {
+        return "CrewMember{" +
+                "idCrewMember=" + idCrewMember +
+                ", role='" + role + '\'' +
+                ", flightHours=" + flightHours +
+                ", idPeople=" + idPeople +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", Email='" + Email + '\'' +
+                ", age=" + age +
+                '}';
+    }
 }

@@ -1,21 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Persons>
-    <People xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="passenger" idPassenger="1" idPeople="-1">
-        <name>1</name>
-        <surname>1</surname>
-        <Email>1</Email>
-        <age>2</age>
+    <People xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="passenger" idPassenger="1" idPeople="1">
+        <name>Carlos</name>
+        <surname>Luna</surname>
+        <Email>luna@gmail.com</Email>
+        <age>28</age>
         <VIP>false</VIP>
-        <flightPoints>0</flightPoints>
+        <flightPoints>2000</flightPoints>
         <hasSpecialNeeds>false</hasSpecialNeeds>
     </People>
-    <People xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="passenger" idPassenger="1" idPeople="-1">
-        <name>1</name>
-        <surname>1</surname>
-        <Email>1</Email>
-        <age>2</age>
+    <People xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="passenger" idPassenger="2" idPeople="2">
+        <name>Robert</name>
+        <surname>joe</surname>
+        <Email>roberoe@gmail.com</Email>
+        <age>45</age>
         <VIP>false</VIP>
-        <flightPoints>0</flightPoints>
+        <flightPoints>500</flightPoints>
+        <hasSpecialNeeds>false</hasSpecialNeeds>
+    </People>
+
+    <People xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="crewMember" idCrewMember="1" idPeople="3">
+        <name>Robert</name>
+        <surname>joe</surname>
+        <Email>roberoe@gmail.com</Email>
+        <age>45</age>
+        <VIP>false</VIP>
+        <flightPoints>500</flightPoints>
         <hasSpecialNeeds>false</hasSpecialNeeds>
     </People>
 </Persons>

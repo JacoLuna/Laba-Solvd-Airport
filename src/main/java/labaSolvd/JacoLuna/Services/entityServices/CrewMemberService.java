@@ -21,6 +21,7 @@ import labaSolvd.JacoLuna.Parsers.SAX.PeopleSaxParser;
 import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
 import labaSolvd.JacoLuna.myBatysDAO.CrewMemberMapper;
+import labaSolvd.JacoLuna.myBatysDAO.PeopleMapper;
 import labaSolvd.JacoLuna.myBatysDAO.ReviewMapper;
 import org.apache.ibatis.session.SqlSession;
 import org.xml.sax.SAXException;
@@ -40,7 +41,6 @@ public class CrewMemberService implements IService<CrewMember> {
     private final SourceOptions source;
     private Persons persons;
     private final List<CrewMember> crewMembersList;
-    private CrewMemberDAO crewMemberDAO;
 
     public CrewMemberService(SourceOptions source) {
         this.peopleService = new PeopleService(source);
@@ -48,12 +48,10 @@ public class CrewMemberService implements IService<CrewMember> {
         if (this.source == SourceOptions.XML) {
             persons = new Persons();
         }
-        if (this.source == SourceOptions.DATA_BASE) {
-            crewMemberDAO = new CrewMemberDAO();
-        }
         crewMembersList = getAll();
     }
 
+    @Override
     public void add() {
         String name = InputService.stringAns("Please input name: ");
         String surname = InputService.stringAns("Please input surname: ");
@@ -66,7 +64,10 @@ public class CrewMemberService implements IService<CrewMember> {
         switch (source) {
             case XML -> addCrewMemberWithXML(crewMember);
             case JSON -> JsonParser.parse(crewMembersList, JsonPaths.PEOPLE);
-            case DATA_BASE -> crewMemberDAO.add(crewMember);
+            case DATA_BASE -> {
+//                EntityDAO.executeQuery(PeopleMapper.class, "insertPeople", crewMember);
+                EntityDAO.executeQuery(CrewMemberMapper.class, "insertCrewMember", crewMember);
+            }
         }
     }
 
@@ -119,6 +120,7 @@ public class CrewMemberService implements IService<CrewMember> {
         }
     }
 
+    @Override
     public CrewMember getById() {
         long id = selectCrewMemberId();
         return switch (source) {
@@ -129,6 +131,7 @@ public class CrewMemberService implements IService<CrewMember> {
         };
     }
 
+    @Override
     public boolean delete() {
         boolean result = false;
         long id = selectCrewMemberId();
@@ -140,6 +143,7 @@ public class CrewMemberService implements IService<CrewMember> {
         return result;
     }
 
+    @Override
     public List<CrewMember> getAll() {
         return switch (source) {
             case XML -> {
@@ -156,9 +160,20 @@ public class CrewMemberService implements IService<CrewMember> {
         };
     }
 
+    @Override
     public void update() {
         CrewMember crewMember = getById();
         updateCrewMemberAttributes(crewMember);
+        System.out.println(crewMember.toString());
+        switch (source) {
+            case DATA_BASE -> {
+                EntityDAO.executeQuery(PeopleMapper.class, "updatePeople", crewMember);
+                EntityDAO.executeQuery(CrewMemberMapper.class, "updateCrewMember", crewMember);
+            }
+        }
+//            case XML -> ;
+//            case JSON -> ;
+
 //        try {
 //            passengerDAO.update(passenger);
 //        } catch (Exception e) {
@@ -166,32 +181,34 @@ public class CrewMemberService implements IService<CrewMember> {
 //        }
     }
 
+    @Override
     public List<CrewMember> search() {
         List<Field> attributes = getCrewMemberAttributes();
         List<CrewMember> crewMembers = new ArrayList<>();
-        try {
-            Object value;
-            int attIndex = selectAtt(attributes);
+        Object value;
+        int attIndex = selectAtt(attributes);
+        Field att = attributes.get(attIndex);
+        String prompt = "Search value: ";
+        if (att.getType().equals(String.class)) {
+            value = InputService.stringAns("Please enter the search value");
+        } else {
+            Class<?> fieldType = att.getType();
+            value = switch (fieldType.getName()) {
+                case "int" -> InputService.setInput(prompt, Integer.class);
+                case "double" -> InputService.setInput(prompt, Double.class);
+                case "float" -> InputService.setInput(prompt, Float.class);
+                case "boolean" -> InputService.booleanAns("is the value true?");
+                default -> null;
+            };
+        }
 
-            if (attributes.get(attIndex).getType().equals(String.class)) {
-                value = InputService.stringAns("Please enter the search value");
-//                crewMembers = passengerDAO.search(attributes.get(attIndex).getName(), (String) value);
-            } else {
-
-                Class<?> fieldType = attributes.get(attIndex).getType();
-                Utils.CONSOLE.info(fieldType.getName());
-                value = switch (fieldType.getName()) {
-                    case "int" -> InputService.setInput("Please enter the search value", Integer.class);
-                    case "double" -> InputService.setInput("Please enter the search value", Double.class);
-                    case "float" -> InputService.setInput("Please enter the search value", Float.class);
-                    case "boolean" -> InputService.booleanAns("is the value true?");
-                    default -> null;
-                };
-//                if (value != null)
-//                    passengers = passengerDAO.search(attributes.get(attIndex).getName(), value);
+        if (value != null) {
+            switch (source) {
+                case XML -> crewMembers = crewMembersList;
+                case JSON -> crewMembers = crewMembersList;
+                case DATA_BASE ->
+                        crewMembers = EntityDAO.executeQuery(CrewMemberMapper.class, (att.getType().equals(String.class)) ? "searchByString" : "searchByOther", att.getName(), value);
             }
-        } catch (Exception e) {
-            Utils.CONSOLE.error("Error while searching crewMembers: {}", e.getMessage());
         }
         return crewMembers;
     }
@@ -239,14 +256,14 @@ public class CrewMemberService implements IService<CrewMember> {
 
     private void updateAttribute(CrewMember crewMember, Field field) {
         field.setAccessible(true);
-        switch (field.getName()) {
+        switch (field.getName().toLowerCase()) {
             case "name" -> crewMember.setName(InputService.stringAns("Name: "));
             case "surname" -> crewMember.setSurname(InputService.stringAns("Surname: "));
             case "email" -> crewMember.setEmail(InputService.stringAns("Email: "));
             case "age" -> crewMember.setAge(InputService.setInput(
                     "How old is " + crewMember.getName() + "?", 0, Integer.MAX_VALUE, Integer.class));
             case "role" -> crewMember.setRole(InputService.stringAns("Role: "));
-            case "flightHours" ->
+            case "flighthours" ->
                     crewMember.setFlightHours(InputService.setInput("Flight hours: ", 0, Integer.MAX_VALUE, Integer.class));
         }
     }
