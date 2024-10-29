@@ -28,5 +28,5 @@ public interface ReviewMapper {
     List<Review> searchByString(@Param("column") String column,@Param("value") String value);
 
     @Select("SELECT * FROM review as pas WHERE ${column} = #{value}")
-    <T extends Number>List<Review> searchByNumber(@Param("column") String column,@Param("value") T value);
+    <T>List<Review> searchByOther(@Param("column") String column,@Param("value") T value);
 }

@@ -4,6 +4,7 @@ import jakarta.xml.bind.JAXBException;
 import labaSolvd.JacoLuna.Classes.Review;
 import labaSolvd.JacoLuna.Classes.xmlLists.Reviews;
 import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
+import labaSolvd.JacoLuna.DAO.EntityDAO;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
 import labaSolvd.JacoLuna.Enums.XmlPaths;
@@ -12,6 +13,7 @@ import labaSolvd.JacoLuna.Parsers.JAX.Marshaller;
 import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
+import labaSolvd.JacoLuna.myBatysDAO.CrewMemberMapper;
 import labaSolvd.JacoLuna.myBatysDAO.ReviewMapper;
 import org.apache.ibatis.session.SqlSession;
 
@@ -24,34 +26,29 @@ public class ReviewsService extends EntityService<Review> implements IService<Re
     private final SourceOptions source;
     private Reviews reviews;
     public List<Review> reviewList;
+
     public ReviewsService(SourceOptions source) {
         super(Review.class);
         this.source = source;
-        if (source == SourceOptions.XML){
+        if (source == SourceOptions.XML) {
             reviews = new Reviews();
         }
         reviewList = getAll();
     }
+
     @Override
     public void add() {
         Review review;
-        long idReview = InputService.setInput("idReview",(long)100, Long.class);
-        long idFlight = InputService.setInput("IdFlight",(long)100, Long.class);
-        long idPassenger = InputService.setInput("IdPassenger",(long)100, Long.class);
-        int rating = InputService.setInput("Rating",100, Integer.class);
+        long idReview = InputService.setInput("idReview", (long) 100, Long.class);
+        long idFlight = InputService.setInput("IdFlight", (long) 100, Long.class);
+        long idPassenger = InputService.setInput("IdPassenger", (long) 100, Long.class);
+        int rating = InputService.setInput("Rating", 100, Integer.class);
         String comment = InputService.stringAns("Please enter the comment");
-        review = new Review(idReview,idFlight,idPassenger,rating,comment);
+        review = new Review(idReview, idFlight, idPassenger, rating, comment);
 
-        if (source == SourceOptions.DATA_BASE){
-            try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                if (session.getMapper(ReviewMapper.class).insertReview(review) > 0) {
-                    session.commit();
-                    Utils.CONSOLE.info("Review added code:{}", review.getIdReview());
-                }
-            } catch (Exception e) {
-                Utils.CONSOLE_ERROR.error(e);
-            }
-        }else {
+        if (source == SourceOptions.DATA_BASE) {
+            EntityDAO.executeQuery(ReviewMapper.class, "insertReview", review);
+        } else {
             reviewList.add(review);
             reviews.setReviews(reviewList);
             try {
@@ -83,13 +80,7 @@ public class ReviewsService extends EntityService<Review> implements IService<Re
                     Utils.CONSOLE_ERROR.error(e);
                 }
             }
-            case DATA_BASE -> {
-                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                    return session.getMapper(ReviewMapper.class).getReview(id);
-                } catch (Exception e) {
-                    Utils.CONSOLE_ERROR.error(e);
-                }
-            }
+            case DATA_BASE -> EntityDAO.executeQuery(ReviewMapper.class, "getReview", id);
         }
         return null;
     }
@@ -123,17 +114,7 @@ public class ReviewsService extends EntityService<Review> implements IService<Re
                     Utils.CONSOLE_ERROR.error(e);
                 }
             }
-            case DATA_BASE -> {
-                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                    if (session.getMapper(ReviewMapper.class).deleteReview(id) > 0) {
-                        session.commit();
-                        result = true;
-                    }
-
-                } catch (Exception e) {
-                    Utils.CONSOLE_ERROR.error(e);
-                }
-            }
+            case DATA_BASE -> EntityDAO.executeQuery(ReviewMapper.class, "deleteReview", id);
         }
         return result;
     }
@@ -151,13 +132,8 @@ public class ReviewsService extends EntityService<Review> implements IService<Re
             case JSON -> {
                 return JsonParser.unparseToList(Review.class, JsonPaths.REVIEWS);
             }
-            case DATA_BASE -> {
-                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                    return session.getMapper(ReviewMapper.class).getAllReviews();
-                } catch (Exception e) {
-                    Utils.CONSOLE_ERROR.error(e);
-                }
-            }
+            case DATA_BASE -> EntityDAO.executeQuery(ReviewMapper.class, "getAllReviews");
+
         }
         return null;
     }
@@ -165,27 +141,25 @@ public class ReviewsService extends EntityService<Review> implements IService<Re
     @Override
     public List<Review> search() {
         List<Review> searchList = null;
-        try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-            List<Field> attributes = Arrays.stream(Review.class.getDeclaredFields()).toList();
-            int attIndex = selectAtt(attributes);
-            Field attribute = attributes.get(attIndex);
-            Object value;
-
-            if (attribute.getType().equals(String.class)) {
-                value = InputService.stringAns("Please enter the search value");
-                searchList = session.getMapper(ReviewMapper.class).searchByString(attribute.getName(), (String) value);
-            } else {
-                Class<?> fieldType = attribute.getType();
-                Utils.CONSOLE.info(fieldType.getName());
-                String prompt = "Please enter the search value";
-                value = InputService.setInput(prompt, Integer.class);
-
-                if (value != null) {
-                    searchList = session.getMapper(ReviewMapper.class).searchByNumber(attribute.getName(), (Number) value);
-                }
+        List<Field> attributes = Arrays.stream(Review.class.getDeclaredFields()).toList();
+        int attIndex = selectAtt(attributes);
+        Field att = attributes.get(attIndex);
+        Object value;
+        if (att.getType().equals(String.class)) {
+            value = InputService.stringAns("Please enter the search value");
+        } else {
+            Class<?> fieldType = att.getType();
+            Utils.CONSOLE.info(fieldType.getName());
+            String prompt = "Please enter the search value";
+            value = InputService.setInput(prompt, Integer.class);
+        }
+        if (value != null) {
+            switch (source) {
+                case XML -> searchList = this.reviewList;
+                case JSON -> searchList = this.reviewList;
+                case DATA_BASE ->
+                        searchList = EntityDAO.executeQuery(ReviewMapper.class, (att.getType().equals(String.class)) ? "searchByString" : "searchByOther", att.getName(), value);
             }
-        } catch (Exception e) {
-            Utils.CONSOLE.error("Error while searching reviews: {}", e.getMessage());
         }
         return searchList;
     }
@@ -206,15 +180,8 @@ public class ReviewsService extends EntityService<Review> implements IService<Re
                 }
             }
             case JSON -> JsonParser.parse(reviewList, JsonPaths.REVIEWS);
-            case DATA_BASE -> {
-                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                    if (session.getMapper(ReviewMapper.class).updateReview(review) > 0) {
-                        session.commit();
-                    }
-                } catch (Exception e) {
-                    Utils.CONSOLE_ERROR.error(e);
-                }
-            }
+            case DATA_BASE -> EntityDAO.executeQuery(ReviewMapper.class, "updateReview", review);
+
         }
     }
 }
