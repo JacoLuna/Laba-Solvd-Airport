@@ -4,38 +4,52 @@ DEBUG - PooledDataSource forcefully closed/removed all connections.
 DEBUG - PooledDataSource forcefully closed/removed all connections.
 DEBUG - PooledDataSource forcefully closed/removed all connections.
 DEBUG - Opening JDBC Connection
-DEBUG - Created connection 203048480.
-DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@c1a4620]
-DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@c1a4620]
-DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@c1a4620]
-DEBUG - Returned connection 203048480 to pool.
+DEBUG - Created connection 681158875.
+DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@2899a8db]
+DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@2899a8db]
+DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@2899a8db]
+DEBUG - Returned connection 681158875 to pool.
 DEBUG - Opening JDBC Connection
-DEBUG - Created connection 215478702.
-DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@cd7f1ae]
-DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@cd7f1ae]
-DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@cd7f1ae]
-DEBUG - Returned connection 215478702 to pool.
+DEBUG - Created connection 43856716.
+DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@29d334c]
+DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@29d334c]
+DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@29d334c]
+DEBUG - Returned connection 43856716 to pool.
 DEBUG - Opening JDBC Connection
-DEBUG - Created connection 1125098735.
-DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@430fa4ef]
-DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@430fa4ef]
-DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@430fa4ef]
-DEBUG - Returned connection 1125098735 to pool.
+DEBUG - Created connection 896134613.
+DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@3569edd5]
+DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@3569edd5]
+DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@3569edd5]
+DEBUG - Returned connection 896134613 to pool.
 DEBUG - Opening JDBC Connection
-DEBUG - Created connection 521331027.
-DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@1f12e153]
-DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@1f12e153]
-DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@1f12e153]
-DEBUG - Returned connection 521331027 to pool.
+DEBUG - Created connection 585074510.
+DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@22df874e]
+DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@22df874e]
+DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@22df874e]
+DEBUG - Returned connection 585074510 to pool.
 DEBUG - Opening JDBC Connection
-DEBUG - Created connection 1418851979.
-DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@5491f68b]
-DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@5491f68b]
-DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@5491f68b]
-DEBUG - Returned connection 1418851979 to pool.
+DEBUG - Created connection 151515831.
+DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@907f2b7]
+DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@907f2b7]
+DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@907f2b7]
+DEBUG - Returned connection 151515831 to pool.
 DEBUG - Opening JDBC Connection
-DEBUG - Created connection 1777043124.
-DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@69eb86b4]
-DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@69eb86b4]
-DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@69eb86b4]
-DEBUG - Returned connection 1777043124 to pool.
+DEBUG - Created connection 828447060.
+DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@31611954]
+DEBUG - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@31611954]
+DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@31611954]
+DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@31611954]
+DEBUG - Returned connection 828447060 to pool.
+DEBUG - Opening JDBC Connection
+DEBUG - Created connection 1562950869.
+DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@5d28bcd5]
+DEBUG - Committing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@5d28bcd5]
+DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@5d28bcd5]
+DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@5d28bcd5]
+DEBUG - Returned connection 1562950869 to pool.
+DEBUG - Opening JDBC Connection
+DEBUG - Created connection 550572371.
+DEBUG - Setting autocommit to false on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@20d11153]
+DEBUG - Resetting autocommit to true on JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@20d11153]
+DEBUG - Closing JDBC Connection [com.mysql.cj.jdbc.ConnectionImpl@20d11153]
+DEBUG - Returned connection 550572371 to pool.

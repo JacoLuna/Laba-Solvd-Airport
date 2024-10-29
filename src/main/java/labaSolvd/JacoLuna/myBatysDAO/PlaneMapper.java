@@ -30,8 +30,5 @@ public interface PlaneMapper {
     List<Plane> searchByString(@Param("column") String column,@Param("value") String value);
 
     @Select("SELECT * FROM plane as pas WHERE ${column} = #{value}")
-    <T extends Number>List<Plane> searchByNumber(@Param("column") String column,@Param("value") T value);
-
-    @Select("SELECT * FROM plane as pas WHERE ${column} = #{value}")
-    List<Plane> searchByBoolean(@Param("column") String column, boolean value);
+    <T>List<Plane> searchByOther(@Param("column") String column,@Param("value") T value);
 }

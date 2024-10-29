@@ -2,15 +2,10 @@ package labaSolvd.JacoLuna.Services.entityServices;
 
 import jakarta.xml.bind.JAXBException;
 import labaSolvd.JacoLuna.Classes.CrewMember;
-import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.People;
-import labaSolvd.JacoLuna.Classes.Review;
 import labaSolvd.JacoLuna.Classes.xmlLists.Persons;
 import labaSolvd.JacoLuna.Classes.xmlLists.Reviews;
-import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
-import labaSolvd.JacoLuna.DAO.CrewMemberDAO;
 import labaSolvd.JacoLuna.DAO.EntityDAO;
-import labaSolvd.JacoLuna.DAO.PassengerDAO;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
 import labaSolvd.JacoLuna.Enums.XmlPaths;
@@ -22,8 +17,6 @@ import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
 import labaSolvd.JacoLuna.myBatysDAO.CrewMemberMapper;
 import labaSolvd.JacoLuna.myBatysDAO.PeopleMapper;
-import labaSolvd.JacoLuna.myBatysDAO.ReviewMapper;
-import org.apache.ibatis.session.SqlSession;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -33,9 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Stream;
 
-public class CrewMemberService implements IService<CrewMember> {
+public class CrewMemberService extends EntityService<CrewMember> implements IService<CrewMember> {
 
     private final PeopleService peopleService;
     private final SourceOptions source;
@@ -43,6 +35,7 @@ public class CrewMemberService implements IService<CrewMember> {
     private final List<CrewMember> crewMembersList;
 
     public CrewMemberService(SourceOptions source) {
+        super(CrewMember.class);
         this.peopleService = new PeopleService(source);
         this.source = source;
         if (this.source == SourceOptions.XML) {
@@ -64,10 +57,7 @@ public class CrewMemberService implements IService<CrewMember> {
         switch (source) {
             case XML -> addCrewMemberWithXML(crewMember);
             case JSON -> JsonParser.parse(crewMembersList, JsonPaths.PEOPLE);
-            case DATA_BASE -> {
-//                EntityDAO.executeQuery(PeopleMapper.class, "insertPeople", crewMember);
-                EntityDAO.executeQuery(CrewMemberMapper.class, "insertCrewMember", crewMember);
-            }
+            case DATA_BASE -> EntityDAO.executeQuery(CrewMemberMapper.class, "insertCrewMember", crewMember);
         }
     }
 
@@ -122,7 +112,8 @@ public class CrewMemberService implements IService<CrewMember> {
 
     @Override
     public CrewMember getById() {
-        long id = selectCrewMemberId();
+//        long id = selectCrewMemberId();
+        long id = super.selectId();
         return switch (source) {
             case XML -> null;
             case JSON -> null;
@@ -134,7 +125,8 @@ public class CrewMemberService implements IService<CrewMember> {
     @Override
     public boolean delete() {
         boolean result = false;
-        long id = selectCrewMemberId();
+//        long id = selectCrewMemberId();
+        long id = super.selectId();
         switch (source) {
             case XML -> result = false;
             case JSON -> result = false;
@@ -163,8 +155,7 @@ public class CrewMemberService implements IService<CrewMember> {
     @Override
     public void update() {
         CrewMember crewMember = getById();
-        updateCrewMemberAttributes(crewMember);
-        System.out.println(crewMember.toString());
+        updateEntityAttributes(crewMember);
         switch (source) {
             case DATA_BASE -> {
                 EntityDAO.executeQuery(PeopleMapper.class, "updatePeople", crewMember);
@@ -183,7 +174,8 @@ public class CrewMemberService implements IService<CrewMember> {
 
     @Override
     public List<CrewMember> search() {
-        List<Field> attributes = getCrewMemberAttributes();
+//        List<Field> attributes = getCrewMemberAttributes();
+        List<Field> attributes = super.getEntityAttributes();
         List<CrewMember> crewMembers = new ArrayList<>();
         Object value;
         int attIndex = selectAtt(attributes);
@@ -211,60 +203,5 @@ public class CrewMemberService implements IService<CrewMember> {
             }
         }
         return crewMembers;
-    }
-
-    private int selectAtt(List<Field> attributes) {
-        int ans;
-        StringBuilder sb = new StringBuilder("Select an attribute\n");
-        for (int i = 1; i < attributes.size(); i++) {
-            sb.append("\n").append(i).append(" ").append(attributes.get(i).getName());
-        }
-        sb.append("\n").append(attributes.size()).append(" none\n");
-        ans = InputService.setInput(sb.toString(), attributes.size(), Integer.class);
-        return ans;
-    }
-
-    private long selectCrewMemberId() {
-        List<CrewMember> crewMembers = getAll();
-        StringBuilder sb = new StringBuilder("Select the id of the crew member");
-        List<Long> ids = new ArrayList<>();
-        crewMembers.forEach(c -> {
-            ids.add(c.getIdCrewMember());
-            sb.append("\n").append(c.getIdCrewMember()).append(" ").append(c.getName());
-        });
-        sb.append("\n");
-        return InputService.setInput(sb.toString(), ids, Long.class);
-    }
-
-    private void updateCrewMemberAttributes(CrewMember crewMember) {
-        List<Field> attributes = getCrewMemberAttributes();
-        int ans;
-        do {
-            ans = selectAtt(attributes);
-            if (ans < attributes.size()) {
-                updateAttribute(crewMember, attributes.get(ans));
-            }
-        } while (ans != attributes.size());
-    }
-
-    private List<Field> getCrewMemberAttributes() {
-        List<Field> superAttributes = new LinkedList<>(Arrays.asList(CrewMember.class.getSuperclass().getDeclaredFields()));
-        List<Field> childAttributes = new LinkedList<>(Arrays.asList(CrewMember.class.getDeclaredFields()));
-        childAttributes.removeFirst();
-        return Stream.concat(superAttributes.stream(), childAttributes.stream()).toList();
-    }
-
-    private void updateAttribute(CrewMember crewMember, Field field) {
-        field.setAccessible(true);
-        switch (field.getName().toLowerCase()) {
-            case "name" -> crewMember.setName(InputService.stringAns("Name: "));
-            case "surname" -> crewMember.setSurname(InputService.stringAns("Surname: "));
-            case "email" -> crewMember.setEmail(InputService.stringAns("Email: "));
-            case "age" -> crewMember.setAge(InputService.setInput(
-                    "How old is " + crewMember.getName() + "?", 0, Integer.MAX_VALUE, Integer.class));
-            case "role" -> crewMember.setRole(InputService.stringAns("Role: "));
-            case "flighthours" ->
-                    crewMember.setFlightHours(InputService.setInput("Flight hours: ", 0, Integer.MAX_VALUE, Integer.class));
-        }
     }
 }

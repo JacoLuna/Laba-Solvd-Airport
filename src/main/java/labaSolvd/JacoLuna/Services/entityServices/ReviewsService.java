@@ -16,16 +16,16 @@ import labaSolvd.JacoLuna.myBatysDAO.ReviewMapper;
 import org.apache.ibatis.session.SqlSession;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ReviewsService implements IService<Review> {
+public class ReviewsService extends EntityService<Review> implements IService<Review> {
 
     private final SourceOptions source;
     private Reviews reviews;
     public List<Review> reviewList;
     public ReviewsService(SourceOptions source) {
+        super(Review.class);
         this.source = source;
         if (source == SourceOptions.XML){
             reviews = new Reviews();
@@ -64,7 +64,7 @@ public class ReviewsService implements IService<Review> {
 
     @Override
     public Review getById() {
-        long id = selectReviewId();
+        long id = super.selectId();
         switch (source) {
             case XML, JSON -> {
                 try {
@@ -97,7 +97,7 @@ public class ReviewsService implements IService<Review> {
     @Override
     public boolean delete() {
         boolean result = false;
-        long id = selectReviewId();
+        long id = super.selectId();
         switch (source) {
             case XML, JSON -> {
                 try {
@@ -194,7 +194,7 @@ public class ReviewsService implements IService<Review> {
     public void update() {
         Review review = getById();
         int index = reviewList.indexOf(review);
-        updateReviewAttributes(review);
+        super.updateEntityAttributes(review);
         reviewList.set(index, review);
         switch (source) {
             case XML -> {
@@ -215,47 +215,6 @@ public class ReviewsService implements IService<Review> {
                     Utils.CONSOLE_ERROR.error(e);
                 }
             }
-        }
-    }
-
-    private long selectReviewId() {
-        StringBuilder sb = new StringBuilder("Select the code of the review");
-        List<Long> idList = new ArrayList<>();
-        for (Review r : reviewList) {
-            idList.add(r.getIdReview());
-            sb.append("\n").append(r.getIdReview());
-        }
-        sb.append("\n");
-        return InputService.setInput(sb.toString(), idList, Long.class);
-    }
-
-    private void updateReviewAttributes(Review review) {
-        List<Field> attributes = Arrays.stream(Review.class.getDeclaredFields()).toList();
-        int ans;
-        do {
-            ans = selectAtt(attributes);
-            if (ans < attributes.size()) {
-                updateAttribute(review, attributes.get(ans));
-            }
-        } while (ans != attributes.size());
-    }
-
-    private int selectAtt(List<Field> attributes) {
-        int ans;
-        StringBuilder sb = new StringBuilder("Select an attribute\n");
-        for (int i = 3; i < attributes.size(); i++) {
-            sb.append("\n").append(i).append(" ").append(attributes.get(i).getName());
-        }
-        sb.append("\n").append(attributes.size()).append(" none\n");
-        ans = InputService.setInput(sb.toString(), attributes.size(), Integer.class);
-        return ans;
-    }
-
-    private void updateAttribute(Review review, Field field) {
-        field.setAccessible(true);
-        switch (field.getName()) {
-            case "rating" -> review.setRating(InputService.setInput("rating: ",1,5 ,Integer.class));
-            case "comment" -> review.setComment(InputService.stringAns("comment: "));
         }
     }
 }

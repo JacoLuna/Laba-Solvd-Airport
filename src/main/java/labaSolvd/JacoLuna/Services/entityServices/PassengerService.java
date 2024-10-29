@@ -25,7 +25,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class PassengerService implements IService<Passenger> {
+public class PassengerService extends EntityService<Passenger> implements IService<Passenger> {
 
     private final PassengerDAO passengerDAO;
     private final PeopleService peopleService;
@@ -34,6 +34,7 @@ public class PassengerService implements IService<Passenger> {
     private final List<Passenger> passengersList;
 
     public PassengerService(SourceOptions source) {
+        super(Passenger.class);
         this.passengerDAO = new PassengerDAO();
         this.peopleService = new PeopleService(source);
         this.source = source;
@@ -116,13 +117,13 @@ public class PassengerService implements IService<Passenger> {
     }
 
     public Passenger getById() {
-        return passengerDAO.getById(selectPassengerId());
+        return passengerDAO.getById(super.selectId());
     }
 
     public boolean delete() {
         boolean result = false;
         try {
-            passengerDAO.delete(selectPassengerId());
+            passengerDAO.delete(super.selectId());
         } catch (Exception e) {
             Utils.CONSOLE.error("Error while deleting passenger");
         }
@@ -135,7 +136,7 @@ public class PassengerService implements IService<Passenger> {
 
     public void update() {
         Passenger passenger = getById();
-        updatePassengerAttributes(passenger);
+        super.updateEntityAttributes(passenger);
         try {
             passengerDAO.update(passenger);
         } catch (Exception e) {
@@ -144,7 +145,7 @@ public class PassengerService implements IService<Passenger> {
     }
 
     public List<Passenger> search() {
-        List<Field> attributes = getPassengerAttributes();
+        List<Field> attributes = super.getEntityAttributes();
         List<Passenger> passengers = new ArrayList<>();
         try {
             Object value;
@@ -154,7 +155,6 @@ public class PassengerService implements IService<Passenger> {
                 value = InputService.stringAns("Please enter the search value");
                 passengers = passengerDAO.search(attributes.get(attIndex).getName(), (String) value);
             } else {
-
                 Class<?> fieldType = attributes.get(attIndex).getType();
                 Utils.CONSOLE.info(fieldType.getName());
                 value = switch (fieldType.getName()) {
@@ -171,63 +171,5 @@ public class PassengerService implements IService<Passenger> {
             Utils.CONSOLE.error("Error while searching passengers: {}", e.getMessage());
         }
         return passengers;
-    }
-
-    private int selectAtt(List<Field> attributes) {
-        int ans;
-        StringBuilder sb = new StringBuilder("Select an attribute\n");
-        for (int i = 1; i < attributes.size(); i++) {
-            sb.append("\n").append(i).append(" ").append(attributes.get(i).getName());
-        }
-        sb.append("\n").append(attributes.size()).append(" none\n");
-        ans = InputService.setInput(sb.toString(), attributes.size(), Integer.class);
-        return ans;
-    }
-
-    private long selectPassengerId() {
-        List<Passenger> passengers = getAll();
-        StringBuilder sb = new StringBuilder("Select the id of the passenger");
-        List<Long> ids = new ArrayList<>();
-        passengers.forEach(p -> {
-            ids.add(p.getIdPassenger());
-            sb.append("\n").append(p.getIdPassenger()).append(" ").append(p.getName());
-        });
-        sb.append("\n");
-        return InputService.setInput(sb.toString(), ids, Long.class);
-    }
-
-    private void updatePassengerAttributes(Passenger passenger) {
-        List<Field> attributes = getPassengerAttributes();
-        int ans;
-        do {
-            ans = selectAtt(attributes);
-            if (ans < attributes.size()) {
-                updateAttribute(passenger, attributes.get(ans));
-            }
-        } while (ans != attributes.size());
-    }
-
-    private List<Field> getPassengerAttributes() {
-        List<Field> superAttributes = new LinkedList<>(Arrays.asList(Passenger.class.getSuperclass().getDeclaredFields()));
-        List<Field> childAttributes = new LinkedList<>(Arrays.asList(Passenger.class.getDeclaredFields()));
-        childAttributes.removeFirst();
-        return Stream.concat(superAttributes.stream(), childAttributes.stream()).toList();
-    }
-
-    private void updateAttribute(Passenger passenger, Field field) {
-        field.setAccessible(true);
-        switch (field.getName()) {
-            case "name" -> passenger.setName(InputService.stringAns("Name: "));
-            case "surname" -> passenger.setSurname(InputService.stringAns("Surname: "));
-            case "email" -> passenger.setEmail(InputService.stringAns("Email: "));
-            case "age" -> passenger.setAge(InputService.setInput(
-                    "How old is " + passenger.getName() + "?", 0, Integer.MAX_VALUE, Integer.class));
-            case "VIP" ->
-                    passenger.setVIP(InputService.setInput("Is " + passenger.getName() + " VIP?\n0 - No\n1 - Yes", Arrays.asList(0, 1), Integer.class) == 1);
-            case "flightPoints" -> passenger.setFlightPoints(InputService.setInput(
-                    "How many flight points does the passenger have?", 0, Integer.MAX_VALUE, Integer.class));
-            case "hasSpecialNeeds" -> passenger.setHasSpecialNeeds(InputService.setInput(
-                    "Does " + passenger.getName() + " have special needs?\n0 - No\n1 - Yes", Arrays.asList(0, 1), Integer.class) == 1);
-        }
     }
 }

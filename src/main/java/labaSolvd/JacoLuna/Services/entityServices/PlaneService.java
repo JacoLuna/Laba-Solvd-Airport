@@ -5,6 +5,7 @@ import labaSolvd.JacoLuna.Classes.Passenger;
 import labaSolvd.JacoLuna.Classes.Plane;
 import labaSolvd.JacoLuna.Classes.xmlLists.Planes;
 import labaSolvd.JacoLuna.Connection.SessionFactoryBuilder;
+import labaSolvd.JacoLuna.DAO.EntityDAO;
 import labaSolvd.JacoLuna.DAO.PlaneDAO;
 import labaSolvd.JacoLuna.Enums.JsonPaths;
 import labaSolvd.JacoLuna.Enums.SourceOptions;
@@ -14,14 +15,14 @@ import labaSolvd.JacoLuna.Parsers.JAX.Marshaller;
 import labaSolvd.JacoLuna.Parsers.JSON.JsonParser;
 import labaSolvd.JacoLuna.Services.InputService;
 import labaSolvd.JacoLuna.Utils;
+import labaSolvd.JacoLuna.myBatysDAO.CrewMemberMapper;
 import labaSolvd.JacoLuna.myBatysDAO.PlaneMapper;
 import org.apache.ibatis.session.SqlSession;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class PlaneService implements IService<Plane> {
-    private final PlaneDAO planeDAO;
+public class PlaneService extends EntityService<Plane> implements IService<Plane> {
     private final SourceOptions source;
     private Planes planes;
     private List<Plane> planeList;
@@ -29,11 +30,11 @@ public class PlaneService implements IService<Plane> {
     private final int MAX_FUEL_CAPACITY = 300000;
 
     public PlaneService(SourceOptions sourceOptions) {
+        super(Plane.class);
         source = sourceOptions;
         if (source == SourceOptions.XML) {
             planes = new Planes();
         }
-        this.planeDAO = new PlaneDAO();
         planeList = getAll();
     }
 
@@ -129,13 +130,7 @@ public class PlaneService implements IService<Plane> {
                     Utils.CONSOLE_ERROR.error(e);
                 }
             }
-            case DATA_BASE -> {
-                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                    return session.getMapper(PlaneMapper.class).getPlane(id);
-                } catch (Exception e) {
-                    Utils.CONSOLE_ERROR.error(e);
-                }
-            }
+            case DATA_BASE -> EntityDAO.executeQuery(PlaneMapper.class, "getPlane", id);
         }
         return null;
     }
@@ -168,79 +163,58 @@ public class PlaneService implements IService<Plane> {
                     Utils.CONSOLE_ERROR.error(e);
                 }
             }
-            case DATA_BASE -> {
-                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                    if (session.getMapper(PlaneMapper.class).deletePlane(id) > 0) {
-                        session.commit();
-                        result = true;
-                    }
-
-                } catch (Exception e) {
-                    Utils.CONSOLE_ERROR.error(e);
-                }
-            }
+            case DATA_BASE -> EntityDAO.executeQuery(PlaneMapper.class, "deletePlane", id);
         }
         return result;
     }
 
     @Override
     public List<Plane> getAll() {
-        switch (source) {
+        return switch (source) {
             case XML -> {
                 try {
-                    return Marshaller.UnMarshallList(Planes.class, XmlPaths.PLANES);
+                    yield Marshaller.UnMarshallList(Planes.class, XmlPaths.PLANES);
                 } catch (JAXBException e) {
                     Utils.CONSOLE_ERROR.error(e);
+                    yield null;
                 }
             }
-            case JSON -> {
-                return JsonParser.unparseToList(Plane.class, JsonPaths.PLANES);
-            }
-            case DATA_BASE -> {
-                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                    return session.getMapper(PlaneMapper.class).getAllPlanes();
-                } catch (Exception e) {
-                    Utils.CONSOLE_ERROR.error(e);
-                }
-            }
-        }
-        return null;
+            case JSON -> JsonParser.unparseToList(Plane.class, JsonPaths.PLANES);
+            case DATA_BASE -> EntityDAO.executeQuery(PlaneMapper.class, "getAllPlanes");
+            default -> null;
+        };
     }
 
     @Override
     public List<Plane> search() {
         List<Plane> searchList = null;
-        try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-            List<Field> attributes = Arrays.stream(Plane.class.getDeclaredFields()).toList();
-            int attIndex = selectAtt(attributes);
-            Object value;
+        List<Field> attributes = Arrays.stream(Plane.class.getDeclaredFields()).toList();
+        int attIndex = selectAtt(attributes);
+        Field att = attributes.get(attIndex);
+        Object value;
 
-            if (attributes.get(attIndex).getType().equals(String.class)) {
-                value = InputService.stringAns("Please enter the search value");
-                searchList = session.getMapper(PlaneMapper.class).searchByString(attributes.get(attIndex).getName(), (String) value);
-            } else {
-
-                Class<?> fieldType = attributes.get(attIndex).getType();
-                Utils.CONSOLE.info(fieldType.getName());
-                String prompt = "Please enter the search value";
-                value = switch (fieldType.getName()) {
-                    case "int" -> InputService.setInput(prompt, Integer.class);
-                    case "double" -> InputService.setInput(prompt, Double.class);
-                    case "float" -> InputService.setInput(prompt, Float.class);
-                    case "boolean" -> InputService.booleanAns("is the value true?");
-                    default -> null;
-                };
-
-                if (value != null) {
-                    if (value.getClass() == Boolean.class)
-                        searchList = session.getMapper(PlaneMapper.class).searchByBoolean(attributes.get(attIndex).getName(), (Boolean) value);
-                    else
-                        searchList = session.getMapper(PlaneMapper.class).searchByNumber(attributes.get(attIndex).getName(), (Number) value);
-                }
-            }
-        } catch (Exception e) {
-            Utils.CONSOLE.error("Error while searching passengers: {}", e.getMessage());
+        if (att.getType().equals(String.class)) {
+            value = InputService.stringAns("Please enter the search value");
+        } else {
+            Class<?> fieldType = att.getType();
+            String prompt = "Please enter the search value";
+            value = switch (fieldType.getName()) {
+                case "int" -> InputService.setInput(prompt, Integer.class);
+                case "double" -> InputService.setInput(prompt, Double.class);
+                case "float" -> InputService.setInput(prompt, Float.class);
+                case "boolean" -> InputService.booleanAns("is the value true?");
+                default -> null;
+            };
         }
+        if (value != null) {
+            switch (source) {
+                case XML -> searchList = planeList;
+                case JSON -> searchList = planeList;
+                case DATA_BASE ->
+                        searchList = EntityDAO.executeQuery(PlaneMapper.class, (att.getType().equals(String.class)) ? "searchByString" : "searchByOther", att.getName(), value);
+            }
+        }
+
         return searchList;
     }
 
@@ -248,7 +222,7 @@ public class PlaneService implements IService<Plane> {
     public void update() {
         Plane plane = getById();
         int index = planeList.indexOf(plane);
-        updatePlaneAttributes(plane);
+        super.updateEntityAttributes(plane);
         planeList.set(index, plane);
         switch (source) {
             case XML -> {
@@ -260,15 +234,7 @@ public class PlaneService implements IService<Plane> {
                 }
             }
             case JSON -> JsonParser.parse(planeList, JsonPaths.PLANES);
-            case DATA_BASE -> {
-                try (SqlSession session = SessionFactoryBuilder.getSqlSessionFactory().openSession()) {
-                    if (session.getMapper(PlaneMapper.class).updatePlane(plane) > 0) {
-                        session.commit();
-                    }
-                } catch (Exception e) {
-                    Utils.CONSOLE_ERROR.error(e);
-                }
-            }
+            case DATA_BASE -> EntityDAO.executeQuery(PlaneMapper.class, "updatePlane", plane);
         }
     }
 
@@ -283,41 +249,5 @@ public class PlaneService implements IService<Plane> {
         sb.append("\n");
         code = InputService.stringAns(sb.toString(), codeList);
         return code;
-    }
-
-    private void updatePlaneAttributes(Plane plane) {
-        List<Field> attributes = Arrays.stream(Plane.class.getDeclaredFields()).toList();
-        int ans;
-        do {
-            ans = selectAtt(attributes);
-            if (ans < attributes.size()) {
-                updateAttribute(plane, attributes.get(ans));
-            }
-        } while (ans != attributes.size());
-    }
-
-    private int selectAtt(List<Field> attributes) {
-        int ans;
-        StringBuilder sb = new StringBuilder("Select an attribute\n");
-        for (int i = 1; i < attributes.size(); i++) {
-            sb.append("\n").append(i).append(" ").append(attributes.get(i).getName());
-        }
-        sb.append("\n").append(attributes.size()).append(" none\n");
-        ans = InputService.setInput(sb.toString(), attributes.size(), Integer.class);
-        return ans;
-    }
-
-    private void updateAttribute(Plane plane, Field field) {
-        field.setAccessible(true);
-        switch (field.getName()) {
-            case "fuelCapacity" -> plane.setFuelCapacity(InputService.setInput("Fuel capacity: ", Integer.class));
-            case "tripulationSize" ->
-                    plane.setTripulationSize(InputService.setInput("Tripulation size: ", Integer.class));
-            case "economySize" -> plane.setEconomySize(InputService.setInput("economy size: ", Integer.class));
-            case "premiumSize" -> plane.setPremiumSize(InputService.setInput("premium size: ", Integer.class));
-            case "businessSize" -> plane.setBusinessSize(InputService.setInput("business size: ", Integer.class));
-            case "firstClassSize" -> plane.setFirstClassSize(InputService.setInput("firstClass size: ", Integer.class));
-            case "country" -> plane.setCountry(InputService.stringAns("country: "));
-        }
     }
 }
